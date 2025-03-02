@@ -2,16 +2,12 @@
 Module for the creating images for GetAmped Tournament.
 """
 
-import os
-
 import pandas as pd
 import streamlit as st
 from PIL import Image
 
-PLAYERS_FOLDER = "players"
-ACCESSORIES_FOLDER = "accs"
-ACCS_BY_YEAR_FILE = "./accs_by_year.xlsx"
-IMAGE_SIZE = (200, 200)
+from utils.config import set_config_variables
+from utils.image_utils import create_column_image, get_or_create_image
 
 
 @st.cache_data
@@ -24,63 +20,10 @@ def get_accs_df():
         - Name: The accessory name.
         - Ano: The year the accessory was released.
     """
-    return pd.read_excel(ACCS_BY_YEAR_FILE)
+    return pd.read_excel(st.session_state.ACCS_BY_YEAR_FILE)
 
 
-def get_images(folder_path):
-    """Returns a list of image paths in the given folder."""
-    return [
-        os.path.join(folder_path, file)
-        for file in os.listdir(folder_path)
-        if file.endswith((".jpg", ".png"))
-    ]
-
-
-def find_image(folder_path, image_name):
-    """Finds an image by name in the given folder."""
-    for file in os.listdir(folder_path):
-        if (
-            file.lower() == f"{image_name.lower()}.jpg"
-            or file.lower() == f"{image_name.lower()}.png"
-        ):
-            return os.path.join(folder_path, file)
-    return None
-
-
-def resize_image(image_path, size=IMAGE_SIZE):
-    """Resizes an image to the specified size."""
-    img = Image.open(image_path)
-    img = img.resize(size)
-    return img
-
-
-def create_blank_image(size=IMAGE_SIZE):
-    """Creates a blank white image."""
-    return Image.new("RGB", size, (255, 255, 255))
-
-
-def get_or_create_image(folder_path, image_name):
-    """Finds an image or creates a blank one if not found."""
-    image_path = find_image(folder_path, image_name)
-    if image_path is None:
-        return create_blank_image()
-
-    return resize_image(image_path)
-
-
-def create_column_image(images):
-    """Creates a column image from a list of images."""
-    column_width = images[0].width
-    column_height = sum(img.height for img in images)
-    column_image = Image.new("RGB", (column_width, column_height))
-    y_offset = 0
-    for img in images:
-        column_image.paste(img, (0, y_offset))
-        y_offset += img.height
-    return column_image
-
-
-def create_composite_image(players_data):
+def create_composite_image(players_data, image_size):
     """Creates a composite image from a list of player data."""
     player_columns = []
 
@@ -88,12 +31,20 @@ def create_composite_image(players_data):
         name = player[0]
         accessories = player[1:]
 
-        player_image = get_or_create_image(PLAYERS_FOLDER, name)
+        player_image = get_or_create_image(
+            folder_path=st.session_state.PLAYERS_FOLDER,
+            image_name=name,
+            size=image_size,
+        )
         column_images = [player_image]
 
         for accessory in accessories:
             accessory_id = get_accessory_id(accessory)
-            accessory_image = get_or_create_image(ACCESSORIES_FOLDER, accessory_id)
+            accessory_image = get_or_create_image(
+                folder_path=st.session_state.ACCESSORIES_FOLDER,
+                image_name=accessory_id,
+                size=image_size,
+            )
             column_images.append(accessory_image)
 
         column_image = create_column_image(column_images)
@@ -129,7 +80,7 @@ def validate_tournament_data(tournament_data):
     return players_data
 
 
-def create_team_image(team_members, players_data):
+def create_team_image(team_members, players_data, image_size):
     """Creates an image for a team."""
     team_columns = []
     for member in team_members:
@@ -142,12 +93,20 @@ def create_team_image(team_members, players_data):
             )
             return None
 
-        member_image = get_or_create_image(PLAYERS_FOLDER, member)
+        member_image = get_or_create_image(
+            folder_path=st.session_state.PLAYERS_FOLDER,
+            image_name=member,
+            size=image_size,
+        )
         column_images = [member_image]
 
         for accessory in member_data[1:]:
             accessory_id = get_accessory_id(accessory)
-            accessory_image = get_or_create_image(ACCESSORIES_FOLDER, accessory_id)
+            accessory_image = get_or_create_image(
+                folder_path=st.session_state.ACCESSORIES_FOLDER,
+                image_name=accessory_id,
+                size=image_size,
+            )
             column_images.append(accessory_image)
 
         column_image = create_column_image(column_images)
@@ -175,10 +134,10 @@ def get_accessory_id(accessory):
     return None
 
 
-def app():
+def run_app():
     """Streamlit app for creating tournament and team images for GetAmped."""
 
-    st.markdown("## Criador de Imagens de Torneio - GetAmped")
+    st.markdown("## Criar imagens de acessórios")
 
     st.markdown("### Torneio")
     tournament_data_input = st.text_area(
@@ -186,6 +145,14 @@ def app():
         height=200,
         placeholder="jogador1, acessorio1, acessorio2\njogador2, acessorio1, acessorio2",
         key="tournament_data_input",
+    )
+
+    tournament_slider_image_size = st.slider(
+        label="Selecione o tamanho da imagem",
+        min_value=32,
+        max_value=300,
+        value=94,
+        key="tournament_slider_image_size",
     )
 
     if st.button(label="Criar imagem do Torneio", key="create_tournament_image"):
@@ -205,13 +172,19 @@ def app():
         else:
             st.session_state.players_data = players_data
 
-        composite_image = create_composite_image(players_data)
-        composite_image.save("tournament_image.jpg")
+        composite_image = create_composite_image(
+            players_data=players_data,
+            image_size=(tournament_slider_image_size, tournament_slider_image_size),
+        )
+        composite_image.save("generated_images/tournament_image.jpg")
 
         st.session_state.composite_image = composite_image
 
     if "composite_image" in st.session_state:
-        st.image(image=Image.open("tournament_image.jpg"), caption="Imagem do Torneio")
+        st.image(
+            image=Image.open("generated_images/tournament_image.jpg"),
+            caption="Imagem do Torneio",
+        )
 
     st.markdown("---")
     st.markdown("### Formação de Times")
@@ -221,6 +194,14 @@ def app():
         height=200,
         key="team_input",
         placeholder="jogador1, jogador2, jogador3\njogador4, jogador5, jogador6",
+    )
+
+    team_slider_image_size = st.slider(
+        label="Selecione o tamanho da imagem",
+        min_value=32,
+        max_value=300,
+        value=94,
+        key="team_slider_image_size",
     )
 
     if st.button(label="Criar imagens dos Times", key="create_team_images"):
@@ -247,10 +228,17 @@ def app():
         players_data = st.session_state.players_data
 
         for i, team_members in enumerate(team_members_data):
-            team_image = create_team_image(team_members, players_data)
+            team_image = create_team_image(
+                team_members=team_members,
+                players_data=players_data,
+                image_size=(team_slider_image_size, team_slider_image_size),
+            )
             if team_image is not None:
-                team_image.save(f"team_{i+1}.jpg")
-                st.image(image=Image.open(f"team_{i+1}.jpg"), caption=f"Time {i+1}")
+                team_image.save(f"generated_images/team_{i+1}.jpg")
+                st.image(
+                    image=Image.open(f"generated_images/team_{i+1}.jpg"),
+                    caption=f"Time {i+1}",
+                )
 
 
 if __name__ == "__main__":
@@ -259,4 +247,5 @@ if __name__ == "__main__":
         page_icon=":flipper:",
     )
 
-    app()
+    set_config_variables()
+    run_app()

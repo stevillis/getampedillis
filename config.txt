@@ -1,0 +1,4 @@
+PLAYERS_FOLDER=players
+ACCESSORIES_FOLDER=accs
+STYLES_FOLDER=styles
+ACCS_BY_YEAR_FILE=accs_by_year.xlsx

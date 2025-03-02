@@ -181,6 +181,7 @@ pyrightconfig.json
 # Local folders
 accs
 players
+styles
 
 # Accs list
 accs_by_year.xlsx
