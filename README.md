@@ -69,7 +69,7 @@ pip install -r requirements.txt
 Run the app using the following command:
 
 ```bash
-python streamlit run app.py
+python streamlit run 🏠Home.py
 ```
 
 This will start the Streamlit app, and you can access it in your web browser at [http://localhost:8501](http://localhost:8501/)
