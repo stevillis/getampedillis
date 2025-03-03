@@ -1,7 +1,7 @@
 import streamlit as st
 from PIL import Image
 
-from utils.config import set_config_variables
+from utils import PLAYERS_FOLDER, STYLES_FOLDER
 from utils.image_utils import create_column_image, get_or_create_image
 from utils.utils import pad_list
 
@@ -15,7 +15,7 @@ def create_composite_image(players_data, image_size):
         styles = player[1:]
 
         player_image = get_or_create_image(
-            folder_path=st.session_state.PLAYERS_FOLDER,
+            folder_path=PLAYERS_FOLDER,
             image_name=name,
             size=image_size,
         )
@@ -24,7 +24,7 @@ def create_composite_image(players_data, image_size):
         styles = pad_list(styles.copy())
         for style_name in styles:
             style_image = get_or_create_image(
-                folder_path=st.session_state.STYLES_FOLDER,
+                folder_path=STYLES_FOLDER,
                 image_name=style_name,
                 size=image_size,
             )
@@ -119,5 +119,4 @@ if __name__ == "__main__":
         page_icon=":flipper:",
     )
 
-    set_config_variables()
     run_app()

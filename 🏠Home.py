@@ -6,7 +6,7 @@ import pandas as pd
 import streamlit as st
 from PIL import Image
 
-from utils.config import set_config_variables
+from utils import ACCESSORIES_FOLDER, ACCS_BY_YEAR_FILE, PLAYERS_FOLDER
 from utils.image_utils import create_column_image, get_or_create_image
 from utils.utils import pad_list
 
@@ -21,7 +21,7 @@ def get_accs_df():
         - Name: The accessory name.
         - Ano: The year the accessory was released.
     """
-    return pd.read_excel(st.session_state.ACCS_BY_YEAR_FILE)
+    return pd.read_excel(ACCS_BY_YEAR_FILE)
 
 
 def create_composite_image(players_data, image_size):
@@ -33,7 +33,7 @@ def create_composite_image(players_data, image_size):
         accessories = player[1:]
 
         player_image = get_or_create_image(
-            folder_path=st.session_state.PLAYERS_FOLDER,
+            folder_path=PLAYERS_FOLDER,
             image_name=name,
             size=image_size,
         )
@@ -43,7 +43,7 @@ def create_composite_image(players_data, image_size):
         for accessory in accessories:
             accessory_id = get_accessory_id(accessory)
             accessory_image = get_or_create_image(
-                folder_path=st.session_state.ACCESSORIES_FOLDER,
+                folder_path=ACCESSORIES_FOLDER,
                 image_name=accessory_id,
                 size=image_size,
             )
@@ -96,7 +96,7 @@ def create_team_image(team_members, players_data, image_size):
             return None
 
         member_image = get_or_create_image(
-            folder_path=st.session_state.PLAYERS_FOLDER,
+            folder_path=PLAYERS_FOLDER,
             image_name=member,
             size=image_size,
         )
@@ -107,7 +107,7 @@ def create_team_image(team_members, players_data, image_size):
         for accessory in accessories:
             accessory_id = get_accessory_id(accessory)
             accessory_image = get_or_create_image(
-                folder_path=st.session_state.ACCESSORIES_FOLDER,
+                folder_path=ACCESSORIES_FOLDER,
                 image_name=accessory_id,
                 size=image_size,
             )
@@ -254,5 +254,4 @@ if __name__ == "__main__":
         page_icon=":flipper:",
     )
 
-    set_config_variables()
     run_app()
