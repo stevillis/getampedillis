@@ -178,10 +178,4 @@ pyrightconfig.json
 # VSCode
 .vscode
 
-# Local folders
-accs
-players
-styles
-
-# Accs list
-accs_by_year.xlsx
+samples.txt
