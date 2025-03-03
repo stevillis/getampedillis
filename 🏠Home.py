@@ -154,12 +154,12 @@ def run_app():
         key="tournament_data_input",
     )
 
-    tournament_slider_image_size = st.slider(
+    input_tournament_image_size = st.selectbox(
         label="Selecione o tamanho da imagem",
-        min_value=32,
-        max_value=300,
-        value=94,
-        key="tournament_slider_image_size",
+        options=(32, 64, 94, 128),
+        index=2,
+        format_func=lambda x: f"{x}px",
+        key="input_tournament_image_size",
     )
 
     if st.button(label="Criar imagem do Torneio", key="create_tournament_image"):
@@ -181,7 +181,7 @@ def run_app():
 
         composite_image = create_composite_image(
             players_data=players_data,
-            image_size=(tournament_slider_image_size, tournament_slider_image_size),
+            image_size=(input_tournament_image_size, input_tournament_image_size),
         )
         composite_image.save("generated_images/tournament_image.jpg")
 
@@ -197,18 +197,18 @@ def run_app():
     st.markdown("### Formação de Times")
 
     team_tournament_data_input = st.text_area(
-        "Insira apenas os nomes dos jogadores",
+        "Insira apenas os nomes dos jogadores informados acima",
         height=200,
         key="team_input",
         placeholder="jogador1, jogador2, jogador3\njogador4, jogador5, jogador6",
     )
 
-    team_slider_image_size = st.slider(
+    input_team_image_size = st.selectbox(
         label="Selecione o tamanho da imagem",
-        min_value=32,
-        max_value=300,
-        value=94,
-        key="team_slider_image_size",
+        options=(32, 64, 94, 128),
+        index=2,
+        format_func=lambda x: f"{x}px",
+        key="input_team_image_size",
     )
 
     if st.button(label="Criar imagens dos Times", key="create_team_images"):
@@ -238,7 +238,7 @@ def run_app():
             team_image = create_team_image(
                 team_members=team_members,
                 players_data=players_data,
-                image_size=(team_slider_image_size, team_slider_image_size),
+                image_size=(input_team_image_size, input_team_image_size),
             )
             if team_image is not None:
                 team_image.save(f"generated_images/team_{i+1}.jpg")
