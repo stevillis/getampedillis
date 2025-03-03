@@ -6,7 +6,7 @@ import pandas as pd
 import streamlit as st
 from PIL import Image
 
-from utils.config import set_config_variables
+from utils import ACCESSORIES_FOLDER, ACCS_BY_YEAR_FILE, PLAYERS_FOLDER
 from utils.image_utils import create_column_image, get_or_create_image
 from utils.utils import pad_list
 
@@ -21,7 +21,7 @@ def get_accs_df():
         - Name: The accessory name.
         - Ano: The year the accessory was released.
     """
-    return pd.read_excel(st.session_state.ACCS_BY_YEAR_FILE)
+    return pd.read_excel(ACCS_BY_YEAR_FILE)
 
 
 def create_composite_image(players_data, image_size):
@@ -33,7 +33,7 @@ def create_composite_image(players_data, image_size):
         accessories = player[1:]
 
         player_image = get_or_create_image(
-            folder_path=st.session_state.PLAYERS_FOLDER,
+            folder_path=PLAYERS_FOLDER,
             image_name=name,
             size=image_size,
         )
@@ -43,7 +43,7 @@ def create_composite_image(players_data, image_size):
         for accessory in accessories:
             accessory_id = get_accessory_id(accessory)
             accessory_image = get_or_create_image(
-                folder_path=st.session_state.ACCESSORIES_FOLDER,
+                folder_path=ACCESSORIES_FOLDER,
                 image_name=accessory_id,
                 size=image_size,
             )
@@ -96,7 +96,7 @@ def create_team_image(team_members, players_data, image_size):
             return None
 
         member_image = get_or_create_image(
-            folder_path=st.session_state.PLAYERS_FOLDER,
+            folder_path=PLAYERS_FOLDER,
             image_name=member,
             size=image_size,
         )
@@ -107,7 +107,7 @@ def create_team_image(team_members, players_data, image_size):
         for accessory in accessories:
             accessory_id = get_accessory_id(accessory)
             accessory_image = get_or_create_image(
-                folder_path=st.session_state.ACCESSORIES_FOLDER,
+                folder_path=ACCESSORIES_FOLDER,
                 image_name=accessory_id,
                 size=image_size,
             )
@@ -154,12 +154,12 @@ def run_app():
         key="tournament_data_input",
     )
 
-    tournament_slider_image_size = st.slider(
+    input_tournament_image_size = st.selectbox(
         label="Selecione o tamanho da imagem",
-        min_value=32,
-        max_value=300,
-        value=94,
-        key="tournament_slider_image_size",
+        options=(32, 64, 94, 128),
+        index=2,
+        format_func=lambda x: f"{x}px",
+        key="input_tournament_image_size",
     )
 
     if st.button(label="Criar imagem do Torneio", key="create_tournament_image"):
@@ -181,7 +181,7 @@ def run_app():
 
         composite_image = create_composite_image(
             players_data=players_data,
-            image_size=(tournament_slider_image_size, tournament_slider_image_size),
+            image_size=(input_tournament_image_size, input_tournament_image_size),
         )
         composite_image.save("generated_images/tournament_image.jpg")
 
@@ -197,18 +197,18 @@ def run_app():
     st.markdown("### Formação de Times")
 
     team_tournament_data_input = st.text_area(
-        "Insira apenas os nomes dos jogadores",
+        "Insira apenas os nomes dos jogadores informados acima",
         height=200,
         key="team_input",
         placeholder="jogador1, jogador2, jogador3\njogador4, jogador5, jogador6",
     )
 
-    team_slider_image_size = st.slider(
+    input_team_image_size = st.selectbox(
         label="Selecione o tamanho da imagem",
-        min_value=32,
-        max_value=300,
-        value=94,
-        key="team_slider_image_size",
+        options=(32, 64, 94, 128),
+        index=2,
+        format_func=lambda x: f"{x}px",
+        key="input_team_image_size",
     )
 
     if st.button(label="Criar imagens dos Times", key="create_team_images"):
@@ -238,7 +238,7 @@ def run_app():
             team_image = create_team_image(
                 team_members=team_members,
                 players_data=players_data,
-                image_size=(team_slider_image_size, team_slider_image_size),
+                image_size=(input_team_image_size, input_team_image_size),
             )
             if team_image is not None:
                 team_image.save(f"generated_images/team_{i+1}.jpg")
@@ -254,5 +254,4 @@ if __name__ == "__main__":
         page_icon=":flipper:",
     )
 
-    set_config_variables()
     run_app()
