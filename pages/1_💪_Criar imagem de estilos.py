@@ -3,6 +3,7 @@ from PIL import Image
 
 from utils.config import set_config_variables
 from utils.image_utils import create_column_image, get_or_create_image
+from utils.utils import pad_list
 
 
 def create_composite_image(players_data, image_size):
@@ -20,6 +21,7 @@ def create_composite_image(players_data, image_size):
         )
         column_images = [player_image]
 
+        styles = pad_list(styles.copy())
         for style_name in styles:
             style_image = get_or_create_image(
                 folder_path=st.session_state.STYLES_FOLDER,
