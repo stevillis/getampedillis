@@ -8,6 +8,7 @@ from PIL import Image
 
 from utils.config import set_config_variables
 from utils.image_utils import create_column_image, get_or_create_image
+from utils.utils import pad_list
 
 
 @st.cache_data
@@ -38,6 +39,7 @@ def create_composite_image(players_data, image_size):
         )
         column_images = [player_image]
 
+        accessories = pad_list(accessories.copy())
         for accessory in accessories:
             accessory_id = get_accessory_id(accessory)
             accessory_image = get_or_create_image(
@@ -100,7 +102,9 @@ def create_team_image(team_members, players_data, image_size):
         )
         column_images = [member_image]
 
-        for accessory in member_data[1:]:
+        accessories = member_data[1:]
+        accessories = pad_list(accessories.copy())
+        for accessory in accessories:
             accessory_id = get_accessory_id(accessory)
             accessory_image = get_or_create_image(
                 folder_path=st.session_state.ACCESSORIES_FOLDER,
@@ -126,12 +130,15 @@ def create_team_image(team_members, players_data, image_size):
 
 
 def get_accessory_id(accessory):
+    if accessory == "no":
+        return accessory
+
     accs_df = get_accs_df()
     acc_series = accs_df[accs_df["Name"].str.lower() == accessory.lower()]["ID"]
     if len(acc_series) > 0:
         return acc_series.values[0]
 
-    return None
+    return ""
 
 
 def run_app():
