@@ -63,6 +63,52 @@ def validate_tournament_data(tournament_data):
     return players_data
 
 
+def create_team_image(team_members, players_data, image_size):
+    """Creates an image for a team with their styles."""
+    team_columns = []
+    for member in team_members:
+        # Find the member's data in players_data
+        member_data = next((data for data in players_data if data[0] == member), None)
+        if member_data is None:
+            st.error(
+                f"""A imagem do jogador {member} não foi encontrada. Talvez
+                ele seja feio demais..."""
+            )
+            return None
+
+        member_image = get_or_create_image(
+            folder_path=PLAYERS_FOLDER,
+            image_name=member,
+            size=image_size,
+        )
+        column_images = [member_image]
+
+        styles = member_data[1:]
+        styles = pad_list(styles.copy())
+        for style_name in styles:
+            style_image = get_or_create_image(
+                folder_path=STYLES_FOLDER,
+                image_name=style_name,
+                size=image_size,
+            )
+            column_images.append(style_image)
+
+        column_image = create_column_image(column_images)
+        team_columns.append(column_image)
+
+    # Create the team image
+    total_width = sum(img.width for img in team_columns)
+    max_height = max(img.height for img in team_columns)
+    team_image = Image.new("RGB", (total_width, max_height))
+
+    x_offset = 0
+    for img in team_columns:
+        team_image.paste(img, (x_offset, 0))
+        x_offset += img.width
+
+    return team_image
+
+
 def run_app():
     st.markdown("## Criar imagem de estilos")
 
@@ -111,6 +157,63 @@ def run_app():
             image=Image.open("generated_images/tournament_style_image.jpg"),
             caption="Imagem dos jogadores e seus estilos",
         )
+
+    # Add the team formation section
+    st.markdown("---")
+    st.markdown("### Formação de Times com Estilos")
+
+    team_tournament_data_input = st.text_area(
+        "Insira apenas os nomes dos jogadores informados acima",
+        height=200,
+        key="team_styles_input",
+        placeholder="jogador1, jogador2, jogador3\njogador4, jogador5, jogador6",
+    )
+
+    input_team_style_image_size = st.selectbox(
+        label="Selecione o tamanho da imagem dos times",
+        options=(32, 64, 72, 128),
+        index=2,
+        format_func=lambda x: f"{x}px",
+        key="input_team_style_image_size",
+    )
+
+    if st.button(
+        label="Criar imagens dos Times com Estilos", key="create_team_style_images"
+    ):
+        if len(team_tournament_data_input) == 0:
+            st.error(
+                """Insira os dados dos times, otário! Tá querendo ganhar
+                título **JEGUE REI :horse::crown:**?"""
+            )
+            return
+
+        team_members_data = []
+        for line in team_tournament_data_input.splitlines():
+            if line.strip():  # Skip empty lines
+                team_members = [item.strip() for item in line.split(",")]
+                team_members_data.append(team_members)
+
+        if "player_styles_data" not in st.session_state:
+            st.error(
+                """Crie a imagem de estilos primeiro, otário! Tá querendo
+                ganhar título **JEGUE REI :horse::crown:**?"""
+            )
+            return
+
+        players_data = st.session_state.player_styles_data
+
+        for i, team_members in enumerate(team_members_data):
+            team_image = create_team_image(
+                team_members=team_members,
+                players_data=players_data,
+                image_size=(input_team_style_image_size, input_team_style_image_size),
+            )
+            if team_image is not None:
+                team_image.save(f"generated_images/team_styles_{i+1}.jpg")
+                st.image(
+                    image=Image.open(f"generated_images/team_styles_{i+1}.jpg"),
+                    caption=f"Time {i+1} com Estilos",
+                )
 
 
 if __name__ == "__main__":
