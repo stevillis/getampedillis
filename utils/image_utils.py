@@ -1,14 +1,20 @@
+"""
+Image processing utilities for tournament.
+"""
+
 import os
+from pathlib import Path
+from typing import List, Optional, Tuple
 
 from PIL import Image
 
 
-def create_blank_image(size):
+def create_blank_image(size: Tuple[int, int]) -> Image.Image:
     """Creates a blank white image."""
     return Image.new("RGB", size, (255, 255, 255))
 
 
-def create_column_image(images):
+def create_column_image(images: List[Image.Image]) -> Image.Image:
     """Creates a column image from a list of images."""
     column_width = images[0].width
     column_height = sum(img.height for img in images)
@@ -20,7 +26,7 @@ def create_column_image(images):
     return column_image
 
 
-def find_image(folder_path, image_name):
+def find_image(folder_path: Path, image_name: str) -> Optional[str]:
     """Finds an image by name in the given folder."""
     for file in os.listdir(folder_path):
         if (
@@ -31,14 +37,16 @@ def find_image(folder_path, image_name):
     return None
 
 
-def resize_image(image_path, size):
+def resize_image(image_path: Path, size: Tuple[int, int]) -> Image.Image:
     """Resizes an image to the specified size."""
     img = Image.open(image_path)
     img = img.resize(size)
     return img
 
 
-def get_or_create_image(folder_path, image_name, size):
+def get_or_create_image(
+    folder_path: Path, image_name: str, size: Tuple[int, int]
+) -> Image.Image:
     """Finds an image or creates a blank one if not found."""
     image_path = find_image(folder_path, image_name)
     if image_path is None:
