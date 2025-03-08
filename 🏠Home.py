@@ -40,8 +40,8 @@ def create_composite_image(players_data, image_size):
         column_images = [player_image]
 
         accessories = pad_list(accessories.copy())
-        for accessory in accessories:
-            accessory_id = get_accessory_id(accessory)
+        for accessory_id in accessories:
+            # accessory_id = get_accessory_id(accessory)
             accessory_image = get_or_create_image(
                 folder_path=ACCESSORIES_FOLDER,
                 image_name=accessory_id,
@@ -104,8 +104,8 @@ def create_team_image(team_members, players_data, image_size):
 
         accessories = member_data[1:]
         accessories = pad_list(accessories.copy())
-        for accessory in accessories:
-            accessory_id = get_accessory_id(accessory)
+        for accessory_id in accessories:
+            # accessory_id = get_accessory_id(accessory)
             accessory_image = get_or_create_image(
                 folder_path=ACCESSORIES_FOLDER,
                 image_name=accessory_id,
@@ -150,7 +150,7 @@ def run_app():
     tournament_data_input = st.text_area(
         label="Insira os dados do torneio",
         height=200,
-        placeholder="jogador1, acessorio1, acessorio2\njogador2, acessorio1, acessorio2",
+        placeholder="jogador1, id_acessorio1, id_acessorio2\njogador2, id_acessorio1, id_acessorio2",
         key="tournament_data_input",
     )
 
