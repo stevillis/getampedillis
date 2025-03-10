@@ -24,6 +24,21 @@ def get_accs_df():
     return pd.read_excel(ACCS_BY_YEAR_FILE)
 
 
+@st.cache_data
+def get_printable_accs_df():
+    """Returns a dataframe containing the accessory data by year.
+
+    The dataframe contains the columns:
+        - ID: The accessory ID.
+        - Name: The accessory name.
+        - Ano: The year the accessory was released.
+    """
+    accs_df = pd.read_excel(ACCS_BY_YEAR_FILE)
+    accs_df.drop(columns=["Icon"], inplace=True)
+
+    return accs_df
+
+
 def create_composite_image(players_data, image_size):
     """Creates a composite image from a list of player data."""
     player_columns = []
@@ -143,6 +158,20 @@ def get_accessory_id(accessory):
 
 def run_app():
     """Streamlit app for creating tournament and team images for GetAmped."""
+
+    with st.sidebar:
+        st.write("### Lista de acessórios")
+
+        accs_df = get_printable_accs_df()
+
+        acc_year_input = st.multiselect(
+            label="Ano", options=accs_df["Ano"].unique().tolist(), key="acc_year_input"
+        )
+
+        if acc_year_input:
+            accs_df = accs_df[accs_df["Ano"].isin(acc_year_input)]
+
+        st.dataframe(accs_df.set_index(accs_df.columns[0]))
 
     st.markdown("## Criar imagens de acessórios")
 
