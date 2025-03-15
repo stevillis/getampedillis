@@ -180,12 +180,19 @@ def run_app():
     st.markdown("## Criar imagens de acessórios")
 
     st.markdown("### Torneio")
+
+    if "tournament_data" not in st.session_state:
+        st.session_state.tournament_data = ""
+
     tournament_data_input = st.text_area(
         label="Insira os dados do torneio",
         height=200,
         placeholder="jogador1, id_acessorio1, id_acessorio2\njogador2, id_acessorio1, id_acessorio2",
+        value=st.session_state.tournament_data,
         key="tournament_data_input",
     )
+
+    st.session_state["tournament_data"] = tournament_data_input
 
     input_tournament_image_size = st.selectbox(
         label="Selecione o tamanho da imagem",
@@ -229,12 +236,18 @@ def run_app():
     st.markdown("---")
     st.markdown("### Formação de Times")
 
+    if "team_tournament_data" not in st.session_state:
+        st.session_state.team_tournament_data = ""
+
     team_tournament_data_input = st.text_area(
         "Insira apenas os nomes dos jogadores informados acima",
         height=200,
-        key="team_input",
+        key="team_tournament_data_input",
         placeholder="jogador1, jogador2, jogador3\njogador4, jogador5, jogador6",
+        value=st.session_state.team_tournament_data,
     )
+
+    st.session_state["team_tournament_data"] = team_tournament_data_input
 
     input_team_image_size = st.selectbox(
         label="Selecione o tamanho da imagem",
