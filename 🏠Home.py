@@ -8,7 +8,7 @@ from PIL import Image
 
 from utils import ACCESSORIES_FOLDER, ACCS_BY_YEAR_FILE, PLAYERS_FOLDER
 from utils.image_utils import create_column_image, get_or_create_image
-from utils.utils import pad_list
+from utils.utils import get_players_df, pad_list
 
 
 @st.cache_data
@@ -35,6 +35,7 @@ def get_printable_accs_df():
     """
     accs_df = pd.read_excel(ACCS_BY_YEAR_FILE)
     accs_df.drop(columns=["Icon"], inplace=True)
+    accs_df.set_index("Name", inplace=True)
 
     return accs_df
 
@@ -160,6 +161,9 @@ def run_app():
     """Streamlit app for creating tournament and team images for GetAmped."""
 
     with st.sidebar:
+        st.write("### Lista de jogadores")
+        st.dataframe(get_players_df())
+
         st.write("### Lista de acessórios")
 
         accs_df = get_printable_accs_df()
@@ -171,7 +175,7 @@ def run_app():
         if acc_year_input:
             accs_df = accs_df[accs_df["Ano"].isin(acc_year_input)]
 
-        st.dataframe(accs_df.set_index(accs_df.columns[0]))
+        st.dataframe(accs_df)
 
     st.markdown("## Criar imagens de acessórios")
 

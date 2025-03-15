@@ -3,7 +3,7 @@ from PIL import Image
 
 from utils import PLAYERS_FOLDER, STYLES_FOLDER
 from utils.image_utils import create_column_image, get_or_create_image
-from utils.utils import pad_list
+from utils.utils import get_players_df, pad_list
 
 
 def create_composite_image(players_data, image_size):
@@ -110,7 +110,12 @@ def create_team_image(team_members, players_data, image_size):
 
 
 def run_app():
+    with st.sidebar:
+        st.write("### Lista de jogadores")
+        st.dataframe(get_players_df())
+
     st.markdown("## Criar imagem de estilos")
+    st.markdown("### Torneio")
 
     tournament_data_input = st.text_area(
         label="Insira os dados dos jogadores e seus estilos",
@@ -160,7 +165,7 @@ def run_app():
 
     # Add the team formation section
     st.markdown("---")
-    st.markdown("### Formação de Times com Estilos")
+    st.markdown("### Formação de Times")
 
     team_tournament_data_input = st.text_area(
         "Insira apenas os nomes dos jogadores informados acima",
@@ -177,9 +182,7 @@ def run_app():
         key="input_team_style_image_size",
     )
 
-    if st.button(
-        label="Criar imagens dos Times com Estilos", key="create_team_style_images"
-    ):
+    if st.button(label="Criar imagens dos Times", key="create_team_style_images"):
         if len(team_tournament_data_input) == 0:
             st.error(
                 """Insira os dados dos times, otário! Tá querendo ganhar
