@@ -4,7 +4,7 @@ from typing import List
 import pandas as pd
 import streamlit as st
 
-from utils import PLAYERS_FOLDER
+from utils import PLAYERS_FOLDER, STYLES_FOLDER
 
 """Utility functions for list manipulation and other general-purpose operations."""
 
@@ -32,3 +32,17 @@ def get_players_df():
     players_df = players_df[players_df["Name"] != "no"]
 
     return players_df.sort_values("Name")
+
+
+@st.cache_data
+def get_styles_df():
+    player_files = [
+        f.replace(".png", "").replace(".jpg", "")
+        for f in os.listdir(STYLES_FOLDER)
+        if (f.endswith(".png") or f.endswith(".jpg"))
+    ]
+
+    styles_df = pd.DataFrame({"Name": player_files})
+    styles_df = styles_df[styles_df["Name"] != "no"]
+
+    return styles_df.sort_values("Name")

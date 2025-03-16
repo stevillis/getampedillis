@@ -3,7 +3,7 @@ from PIL import Image
 
 from utils import PLAYERS_FOLDER, STYLES_FOLDER
 from utils.image_utils import create_column_image, get_or_create_image
-from utils.utils import get_players_df, pad_list
+from utils.utils import get_players_df, get_styles_df, pad_list
 
 
 def create_composite_image(players_data, image_size):
@@ -113,6 +113,9 @@ def run_app():
     with st.sidebar:
         st.write("### Lista de jogadores")
         st.dataframe(get_players_df())
+
+        st.write("### Lista de estilos")
+        st.dataframe(get_styles_df())
 
     st.markdown("## Criar imagem de estilos")
     st.markdown("### Torneio")
