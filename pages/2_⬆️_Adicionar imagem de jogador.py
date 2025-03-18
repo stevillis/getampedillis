@@ -1,5 +1,7 @@
 import streamlit as st
 
+from utils import PLAYERS_FOLDER
+
 if __name__ == "__main__":
     st.set_page_config(
         page_title="Lojas Boto Produções",
@@ -22,7 +24,7 @@ if __name__ == "__main__":
                     """
                 )
             else:
-                with open(f"data/players/{player_name_input}.png", "wb") as f:
+                with open(f"{PLAYERS_FOLDER}/{player_name_input}.png", "wb") as f:
                     f.write(uploaded_file.getvalue())
 
                 st.success("Imagem adicionada com sucesso!")
