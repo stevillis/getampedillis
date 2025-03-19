@@ -112,10 +112,53 @@ def create_team_image(team_members, players_data, image_size):
 def run_app():
     with st.sidebar:
         st.write("### Lista de jogadores")
-        st.dataframe(get_players_df())
+        with st.container(height=250):
+            players_df = get_players_df()
+            num_cols = 5
+            num_rows = (len(players_df) + num_cols - 1) // num_cols
+
+            for i in range(num_rows):
+                cols = st.columns(num_cols)
+                for j, col in enumerate(cols):
+                    index = i * num_cols + j
+                    if index < len(players_df):
+                        player_name = players_df.iloc[index]["Name"]
+                        player_image = get_or_create_image(
+                            folder_path=PLAYERS_FOLDER,
+                            image_name=player_name,
+                            size=(32, 32),
+                        )
+                        with col:
+                            st.image(player_image)
+                            st.write(
+                                f'<span style="font-size: 10px;">{player_name}</span>',
+                                unsafe_allow_html=True,
+                            )
 
         st.write("### Lista de estilos")
-        st.dataframe(get_styles_df())
+
+        with st.container(height=250):
+            styles_df = get_styles_df()
+            num_cols = 5
+            num_rows = (len(styles_df) + num_cols - 1) // num_cols
+
+            for i in range(num_rows):
+                cols = st.columns(num_cols)
+                for j, col in enumerate(cols):
+                    index = i * num_cols + j
+                    if index < len(styles_df):
+                        style_name = styles_df.iloc[index]["Name"]
+                        player_image = get_or_create_image(
+                            folder_path=STYLES_FOLDER,
+                            image_name=style_name,
+                            size=(32, 32),
+                        )
+                        with col:
+                            st.image(player_image)
+                            st.write(
+                                f'<span style="font-size: 10px;">{style_name}</span>',
+                                unsafe_allow_html=True,
+                            )
 
     st.markdown("## Criar imagem de estilos")
     st.markdown("### Torneio")
