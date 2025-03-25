@@ -36,6 +36,10 @@ def get_printable_accs_df():
     accs_df = pd.read_excel(ACCS_BY_YEAR_FILE)
     accs_df.drop(columns=["Icon"], inplace=True)
     accs_df.set_index("Name", inplace=True)
+    accs_df["Icon"] = accs_df["ID"].apply(
+        lambda x: f"https://github.com/stevillis/tournament_image_creator/blob/master/data/accs/{x}.png?raw=true"
+    )
+    accs_df["selected"] = False
 
     return accs_df
 
@@ -185,20 +189,39 @@ def run_app():
                                 unsafe_allow_html=True,
                             )
 
-        st.write("### Lista de acessórios")
-
-        accs_df = get_printable_accs_df()
-
-        acc_year_input = st.multiselect(
-            label="Ano", options=accs_df["Ano"].unique().tolist(), key="acc_year_input"
-        )
-
-        if acc_year_input:
-            accs_df = accs_df[accs_df["Ano"].isin(acc_year_input)]
-
-        st.dataframe(accs_df)
-
     st.markdown("## Criar imagens de acessórios")
+
+    st.write("#### Lista de acessórios")
+
+    accs_df = get_printable_accs_df()
+
+    acc_year_input = st.multiselect(
+        label="Ano", options=accs_df["Ano"].unique().tolist(), key="acc_year_input"
+    )
+
+    if acc_year_input:
+        accs_df = accs_df[accs_df["Ano"].isin(acc_year_input)]
+
+    edited_accs_df = st.data_editor(
+        accs_df,
+        width=500,
+        column_config={
+            "selected": st.column_config.CheckboxColumn(
+                "Adicionar acessório",
+                help="Marque para adicionar o acessório ao torneio",
+                default=False,
+            ),
+            "Icon": st.column_config.ImageColumn("Icon", help=""),
+        },
+        disabled=["Name", "ID", "Ano", "Icon"],
+    )
+
+    selected_ids = edited_accs_df[edited_accs_df["selected"] == True]["ID"].tolist()
+    for acc_id in selected_ids:
+        st.session_state.tournament_data += f", {acc_id}"
+        edited_accs_df.loc[edited_accs_df["ID"] == acc_id, "selected"] = False
+
+    st.session_state.accs_df = edited_accs_df
 
     st.markdown("### Torneio")
 
