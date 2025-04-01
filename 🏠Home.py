@@ -161,6 +161,14 @@ def get_accessory_id(accessory):
     return ""
 
 
+def update_tournament_data():
+    st.session_state.tournament_data = st.session_state.tournament_data_input
+
+
+def update_team_data():
+    st.session_state.team_tournament_data = st.session_state.team_tournament_data_input
+
+
 def run_app():
     """Streamlit app for creating tournament and team images for GetAmped."""
 
@@ -234,9 +242,8 @@ def run_app():
         placeholder="jogador1, id_acessorio1, id_acessorio2\njogador2, id_acessorio1, id_acessorio2",
         value=st.session_state.tournament_data,
         key="tournament_data_input",
+        on_change=update_tournament_data,
     )
-
-    st.session_state["tournament_data"] = tournament_data_input
 
     input_tournament_image_size = st.selectbox(
         label="Selecione o tamanho da imagem",
@@ -247,14 +254,14 @@ def run_app():
     )
 
     if st.button(label="Criar imagem do Torneio", key="create_tournament_image"):
-        if len(tournament_data_input) == 0:
+        if len(st.session_state.tournament_data) == 0:
             st.error(
                 """Insira os dados do torneio, otário! Tá querendo ganhar
                 título **JEGUE REI :horse::crown:**?"""
             )
             return
 
-        players_data = validate_tournament_data(tournament_data_input)
+        players_data = validate_tournament_data(st.session_state.tournament_data)
         if players_data is None:
             return
 
@@ -289,9 +296,8 @@ def run_app():
         key="team_tournament_data_input",
         placeholder="jogador1, jogador2, jogador3\njogador4, jogador5, jogador6",
         value=st.session_state.team_tournament_data,
+        on_change=update_team_data,
     )
-
-    st.session_state["team_tournament_data"] = team_tournament_data_input
 
     input_team_image_size = st.selectbox(
         label="Selecione o tamanho da imagem",
@@ -302,7 +308,7 @@ def run_app():
     )
 
     if st.button(label="Criar imagens dos Times", key="create_team_images"):
-        if len(team_tournament_data_input) == 0:
+        if len(st.session_state.team_tournament_data) == 0:
             st.error(
                 """Insira os dados dos times, otário! Tá querendo ganhar
                 título **JEGUE REI :horse::crown:**?"""
@@ -310,7 +316,7 @@ def run_app():
             return
 
         team_members_data = []
-        for line in team_tournament_data_input.splitlines():
+        for line in st.session_state.team_tournament_data.splitlines():
             if line.strip():  # Skip empty lines
                 team_members = [item.strip() for item in line.split(",")]
                 team_members_data.append(team_members)
