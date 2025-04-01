@@ -109,6 +109,18 @@ def create_team_image(team_members, players_data, image_size):
     return team_image
 
 
+def update_style_tournament_data():
+    st.session_state.style_tournament_data = (
+        st.session_state.style_tournament_data_input
+    )
+
+
+def update_team_style_tournament_data():
+    st.session_state.team_style_tournament_data = (
+        st.session_state.team_style_tournament_data_input
+    )
+
+
 def run_app():
     with st.sidebar:
         st.write("### Lista de jogadores")
@@ -172,9 +184,8 @@ def run_app():
         placeholder="jogador1, estilo1, estilo2\njogador2, estilo1, estilo2",
         value=st.session_state.style_tournament_data,
         key="style_tournament_data_input",
+        on_change=update_style_tournament_data,
     )
-
-    st.session_state["style_tournament_data"] = style_tournament_data_input
 
     input_style_image_size = st.selectbox(
         label="Selecione o tamanho da imagem",
@@ -185,14 +196,14 @@ def run_app():
     )
 
     if st.button(label="Criar imagem de estilos", key="create_tournament_image"):
-        if len(style_tournament_data_input) == 0:
+        if len(st.session_state.style_tournament_data) == 0:
             st.error(
                 """Insira os dados dos jogadores e seus estilos, otário! Tá querendo ganhar
                 título **JEGUE REI :horse::crown:**?"""
             )
             return
 
-        players_data = validate_tournament_data(style_tournament_data_input)
+        players_data = validate_tournament_data(st.session_state.style_tournament_data)
         if players_data is None:
             return
 
@@ -228,9 +239,8 @@ def run_app():
         key="team_style_tournament_data_input",
         placeholder="jogador1, jogador2, jogador3\njogador4, jogador5, jogador6",
         value=st.session_state.team_style_tournament_data,
+        on_change=update_team_style_tournament_data,
     )
-
-    st.session_state["team_style_tournament_data"] = team_style_tournament_data_input
 
     input_team_style_image_size = st.selectbox(
         label="Selecione o tamanho da imagem dos times",
@@ -241,7 +251,7 @@ def run_app():
     )
 
     if st.button(label="Criar imagens dos Times", key="create_team_style_images"):
-        if len(team_style_tournament_data_input) == 0:
+        if len(st.session_state.team_style_tournament_data) == 0:
             st.error(
                 """Insira os dados dos times, otário! Tá querendo ganhar
                 título **JEGUE REI :horse::crown:**?"""
@@ -249,7 +259,7 @@ def run_app():
             return
 
         team_members_data = []
-        for line in team_style_tournament_data_input.splitlines():
+        for line in st.session_state.team_style_tournament_data.splitlines():
             if line.strip():  # Skip empty lines
                 team_members = [item.strip() for item in line.split(",")]
                 team_members_data.append(team_members)
