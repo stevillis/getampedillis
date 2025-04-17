@@ -39,7 +39,6 @@ def get_printable_accs_df():
     accs_df["Icon"] = accs_df["ID"].apply(
         lambda x: f"https://github.com/stevillis/tournament_image_creator/blob/master/data/accs/{x}.png?raw=true"
     )
-    accs_df["selected"] = False
 
     return accs_df
 
@@ -161,14 +160,6 @@ def get_accessory_id(accessory):
     return ""
 
 
-def update_tournament_data():
-    st.session_state.tournament_data = st.session_state.tournament_data_input
-
-
-def update_team_data():
-    st.session_state.team_tournament_data = st.session_state.team_tournament_data_input
-
-
 def run_app():
     """Streamlit app for creating tournament and team images for GetAmped."""
 
@@ -197,52 +188,76 @@ def run_app():
                                 unsafe_allow_html=True,
                             )
 
+        st.write("### Lista de acessórios")
+        printable_accs_df = get_printable_accs_df()
+
+        acc_year_input = st.multiselect(
+            label="Ano",
+            options=printable_accs_df["Ano"].unique().tolist(),
+            key="acc_year_input",
+        )
+
+        if acc_year_input:
+            printable_accs_df = printable_accs_df[
+                printable_accs_df["Ano"].isin(acc_year_input)
+            ]
+
+        edited_printable_accs_df = st.data_editor(
+            printable_accs_df,
+            width=500,
+            disabled=["Name", "ID", "Ano", "Icon"],
+            column_config={
+                "Icon": st.column_config.ImageColumn("Icon", help=""),
+            },
+        )
+
     st.markdown("## Criar imagens de acessórios")
-
-    st.write("#### Lista de acessórios")
-
-    accs_df = get_printable_accs_df()
-
-    acc_year_input = st.multiselect(
-        label="Ano", options=accs_df["Ano"].unique().tolist(), key="acc_year_input"
-    )
-
-    if acc_year_input:
-        accs_df = accs_df[accs_df["Ano"].isin(acc_year_input)]
-
-    edited_accs_df = st.data_editor(
-        accs_df,
-        width=500,
-        column_config={
-            "selected": st.column_config.CheckboxColumn(
-                "Adicionar acessório",
-                help="Marque para adicionar o acessório ao torneio",
-                default=False,
-            ),
-            "Icon": st.column_config.ImageColumn("Icon", help=""),
-        },
-        disabled=["Name", "ID", "Ano", "Icon"],
-    )
-
-    selected_ids = edited_accs_df[edited_accs_df["selected"] == True]["ID"].tolist()
-    for acc_id in selected_ids:
-        st.session_state.tournament_data += f", {acc_id}"
-        edited_accs_df.loc[edited_accs_df["ID"] == acc_id, "selected"] = False
-
-    st.session_state.accs_df = edited_accs_df
 
     st.markdown("### Torneio")
 
-    if "tournament_data" not in st.session_state:
-        st.session_state.tournament_data = ""
+    player_options = players_df["Name"].tolist()
+
+    player_name_input = st.selectbox(
+        "Selecione o jogador",
+        player_options,
+        key="player_name_input",
+    )
+
+    accs_df = get_accs_df().sort_values(by="ID")
+    acc_options = accs_df["ID"].tolist()
+    selected_accs_input = st.multiselect(
+        "Selecione os acessórios",
+        acc_options,
+        key="selected_accs_input",
+    )
+
+    if st.button("Adicionar seleção ao campo de texto"):
+        if not selected_accs_input:
+            st.error(
+                "Selecione pelo menos um acessório, otário! Tá querendo ganhar título **JEGUE REI :horse::crown:**?"
+            )
+        else:
+            # Compose the string: player,acc1,acc2,...
+            line = player_name_input
+
+            if selected_accs_input:
+                line += "," + ",".join(selected_accs_input)
+
+            if "tournament_data_input" not in st.session_state:
+                st.session_state["tournament_data_input"] = ""
+
+            if st.session_state["tournament_data_input"]:
+                st.session_state["tournament_data_input"] += "\n" + line
+            else:
+                st.session_state["tournament_data_input"] = line
+
+        selected_accs_input = []
 
     tournament_data_input = st.text_area(
         label="Insira os dados do torneio",
         height=200,
         placeholder="jogador1, id_acessorio1, id_acessorio2\njogador2, id_acessorio1, id_acessorio2",
-        value=st.session_state.tournament_data,
         key="tournament_data_input",
-        on_change=update_tournament_data,
     )
 
     input_tournament_image_size = st.selectbox(
@@ -254,14 +269,14 @@ def run_app():
     )
 
     if st.button(label="Criar imagem do Torneio", key="create_tournament_image"):
-        if len(st.session_state.tournament_data) == 0:
+        if len(st.session_state.tournament_data_input) == 0:
             st.error(
                 """Insira os dados do torneio, otário! Tá querendo ganhar
                 título **JEGUE REI :horse::crown:**?"""
             )
             return
 
-        players_data = validate_tournament_data(st.session_state.tournament_data)
+        players_data = validate_tournament_data(st.session_state.tournament_data_input)
         if players_data is None:
             return
 
@@ -287,16 +302,40 @@ def run_app():
     st.markdown("---")
     st.markdown("### Formação de Times")
 
-    if "team_tournament_data" not in st.session_state:
-        st.session_state.team_tournament_data = ""
+    # Get player names used in the Torneio section
+    tournament_players = []
+    if "tournament_data_input" in st.session_state:
+        for line in st.session_state["tournament_data_input"].splitlines():
+            if line.strip():
+                player_name = line.split(",")[0].strip()
+                if player_name:
+                    tournament_players.append(player_name)
+
+    tournament_players = sorted(set(tournament_players))
+
+    selected_team_players = st.multiselect(
+        "Selecione os jogadores para o time",
+        options=tournament_players,
+        key="selected_team_players_input",
+    )
+
+    if st.button("Adicionar seleção ao campo de times", key="add_team_players"):
+        if not selected_team_players:
+            st.error(
+                "Selecione pelo menos um jogador para o time, otário! Tá querendo ganhar título **JEGUE REI :horse::crown:**?"
+            )
+        else:
+            line = ", ".join(selected_team_players)
+            if st.session_state.team_tournament_data_input:
+                st.session_state.team_tournament_data_input += f"\n{line}"
+            else:
+                st.session_state.team_tournament_data_input = line
 
     team_tournament_data_input = st.text_area(
         "Insira apenas os nomes dos jogadores informados acima",
         height=200,
         key="team_tournament_data_input",
         placeholder="jogador1, jogador2, jogador3\njogador4, jogador5, jogador6",
-        value=st.session_state.team_tournament_data,
-        on_change=update_team_data,
     )
 
     input_team_image_size = st.selectbox(
@@ -308,7 +347,7 @@ def run_app():
     )
 
     if st.button(label="Criar imagens dos Times", key="create_team_images"):
-        if len(st.session_state.team_tournament_data) == 0:
+        if len(st.session_state.team_tournament_data_input) == 0:
             st.error(
                 """Insira os dados dos times, otário! Tá querendo ganhar
                 título **JEGUE REI :horse::crown:**?"""
@@ -316,7 +355,7 @@ def run_app():
             return
 
         team_members_data = []
-        for line in st.session_state.team_tournament_data.splitlines():
+        for line in st.session_state.team_tournament_data_input.splitlines():
             if line.strip():  # Skip empty lines
                 team_members = [item.strip() for item in line.split(",")]
                 team_members_data.append(team_members)

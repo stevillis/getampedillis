@@ -109,18 +109,6 @@ def create_team_image(team_members, players_data, image_size):
     return team_image
 
 
-def update_style_tournament_data():
-    st.session_state.style_tournament_data = (
-        st.session_state.style_tournament_data_input
-    )
-
-
-def update_team_style_tournament_data():
-    st.session_state.team_style_tournament_data = (
-        st.session_state.team_style_tournament_data_input
-    )
-
-
 def run_app():
     with st.sidebar:
         st.write("### Lista de jogadores")
@@ -175,16 +163,39 @@ def run_app():
     st.markdown("## Criar imagem de estilos")
     st.markdown("### Torneio")
 
-    if "style_tournament_data" not in st.session_state:
-        st.session_state.style_tournament_data = ""
+    player_options = players_df["Name"].tolist()
+    style_player_name_input = st.selectbox(
+        "Selecione o jogador",
+        player_options,
+        key="style_player_name_input",
+    )
+
+    style_options = styles_df["Name"].tolist()
+    selected_styles_input = st.multiselect(
+        "Selecione os estilos",
+        style_options,
+        key="selected_styles_input",
+    )
+
+    if st.button("Adicionar seleção ao campo de texto", key="add_style_selection"):
+        if not selected_styles_input:
+            st.error(
+                "Selecione pelo menos um estilo, otário! Tá querendo ganhar título **JEGUE REI :horse::crown:**?"
+            )
+        else:
+            line = style_player_name_input
+            if selected_styles_input:
+                line += ", " + ", ".join(selected_styles_input)
+            if st.session_state.style_tournament_data_input:
+                st.session_state.style_tournament_data_input += f"\n{line}"
+            else:
+                st.session_state.style_tournament_data_input = line
 
     style_tournament_data_input = st.text_area(
         label="Insira os dados dos jogadores e seus estilos",
         height=200,
         placeholder="jogador1, estilo1, estilo2\njogador2, estilo1, estilo2",
-        value=st.session_state.style_tournament_data,
         key="style_tournament_data_input",
-        on_change=update_style_tournament_data,
     )
 
     input_style_image_size = st.selectbox(
@@ -196,14 +207,16 @@ def run_app():
     )
 
     if st.button(label="Criar imagem de estilos", key="create_tournament_image"):
-        if len(st.session_state.style_tournament_data) == 0:
+        if len(st.session_state.style_tournament_data_input) == 0:
             st.error(
                 """Insira os dados dos jogadores e seus estilos, otário! Tá querendo ganhar
                 título **JEGUE REI :horse::crown:**?"""
             )
             return
 
-        players_data = validate_tournament_data(st.session_state.style_tournament_data)
+        players_data = validate_tournament_data(
+            st.session_state.style_tournament_data_input
+        )
         if players_data is None:
             return
 
@@ -230,16 +243,39 @@ def run_app():
     st.markdown("---")
     st.markdown("### Formação de Times")
 
-    if "team_style_tournament_data" not in st.session_state:
-        st.session_state.team_style_tournament_data = ""
+    styles_players = []
+    if "style_tournament_data_input" in st.session_state:
+        for line in st.session_state["style_tournament_data_input"].splitlines():
+            if line.strip():
+                player_name = line.split(",")[0].strip()
+                if player_name:
+                    styles_players.append(player_name)
+
+    styles_players = sorted(set(styles_players))
+
+    selected_team_style_players = st.multiselect(
+        "Selecione os jogadores para o time",
+        options=styles_players,
+        key="selected_team_style_players",
+    )
+
+    if st.button("Adicionar seleção ao campo de times", key="add_team_style_players"):
+        if not selected_team_style_players:
+            st.error(
+                "Selecione pelo menos um jogador para o time, otário! Tá querendo ganhar título **JEGUE REI :horse::crown:**?"
+            )
+        else:
+            line = ", ".join(selected_team_style_players)
+            if st.session_state.team_style_tournament_data_input:
+                st.session_state.team_style_tournament_data_input += f"\n{line}"
+            else:
+                st.session_state.team_style_tournament_data_input = line
 
     team_style_tournament_data_input = st.text_area(
         "Insira apenas os nomes dos jogadores informados acima",
         height=200,
         key="team_style_tournament_data_input",
         placeholder="jogador1, jogador2, jogador3\njogador4, jogador5, jogador6",
-        value=st.session_state.team_style_tournament_data,
-        on_change=update_team_style_tournament_data,
     )
 
     input_team_style_image_size = st.selectbox(
@@ -251,7 +287,7 @@ def run_app():
     )
 
     if st.button(label="Criar imagens dos Times", key="create_team_style_images"):
-        if len(st.session_state.team_style_tournament_data) == 0:
+        if len(st.session_state.team_style_tournament_data_input) == 0:
             st.error(
                 """Insira os dados dos times, otário! Tá querendo ganhar
                 título **JEGUE REI :horse::crown:**?"""
@@ -259,7 +295,7 @@ def run_app():
             return
 
         team_members_data = []
-        for line in st.session_state.team_style_tournament_data.splitlines():
+        for line in st.session_state.team_style_tournament_data_input.splitlines():
             if line.strip():  # Skip empty lines
                 team_members = [item.strip() for item in line.split(",")]
                 team_members_data.append(team_members)
