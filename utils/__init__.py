@@ -18,6 +18,7 @@ PLAYERS_FOLDER: Path = DATA_DIR / "players"
 ACCESSORIES_FOLDER: Path = DATA_DIR / "accs"
 STYLES_FOLDER: Path = DATA_DIR / "styles"
 ACCS_BY_YEAR_FILE: Path = DATA_DIR / "accs_by_year.xlsx"
+TIRIRICAS_PATH: Path = DATA_DIR / "tiririca.png"
 
 
 def ensure_directories_exist() -> None:

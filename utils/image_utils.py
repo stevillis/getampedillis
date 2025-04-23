@@ -37,21 +37,21 @@ def find_image(folder_path: Path, image_name: str) -> Optional[str]:
             return str(local_path)
 
     # If not found locally, try S3
-    s3 = boto3.client("s3", region_name=S3_REGION)
-    folder = folder_path.name  # "players", "accs", or "styles"
-    for ext in [".png", ".jpg"]:
-        key = f"{folder}/{image_name}{ext}"
-        try:
-            response = s3.get_object(Bucket=S3_BUCKET_NAME, Key=key)
-            # Save to local file for future use
-            local_path = folder_path / f"{image_name}{ext}"
-            with open(local_path, "wb") as f:
-                f.write(response["Body"].read())
-            return str(local_path)
-        except s3.exceptions.NoSuchKey:
-            continue
-        except Exception:
-            continue
+    # s3 = boto3.client("s3", region_name=S3_REGION)
+    # folder = folder_path.name  # "players", "accs", or "styles"
+    # for ext in [".png", ".jpg"]:
+    #     key = f"{folder}/{image_name}{ext}"
+    #     try:
+    #         response = s3.get_object(Bucket=S3_BUCKET_NAME, Key=key)
+    #         # Save to local file for future use
+    #         local_path = folder_path / f"{image_name}{ext}"
+    #         with open(local_path, "wb") as f:
+    #             f.write(response["Body"].read())
+    #         return str(local_path)
+    #     except s3.exceptions.NoSuchKey:
+    #         continue
+    #     except Exception:
+    #         continue
 
     return None
 
