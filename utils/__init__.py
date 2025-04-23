@@ -11,6 +11,7 @@ load_dotenv()
 
 S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME")
 S3_REGION = os.getenv("S3_REGION")
+SHOW_TROLL_INTRO = os.getenv("SHOW_TROLL_INTRO")
 
 DATA_DIR: Path = Path("data")
 
