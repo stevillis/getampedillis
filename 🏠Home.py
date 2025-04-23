@@ -2,11 +2,13 @@
 Module for the creating images for GetAmped Tournament.
 """
 
+import time
+
 import pandas as pd
 import streamlit as st
-from PIL import Image
+from PIL import Image, ImageDraw
 
-from utils import ACCESSORIES_FOLDER, ACCS_BY_YEAR_FILE, PLAYERS_FOLDER
+from utils import ACCESSORIES_FOLDER, ACCS_BY_YEAR_FILE, PLAYERS_FOLDER, TIRIRICAS_PATH
 from utils.image_utils import create_column_image, get_or_create_image
 from utils.utils import get_players_df, pad_list
 
@@ -397,8 +399,19 @@ if __name__ == "__main__":
     if st.session_state.click_counter < 10:
         with placeholder.container():
             st.markdown("# 🚨 O SITE FOI DESATIVADO! 🚨")
-            if st.button("Enviar mensagem para o Administrador"):
+            if st.button(
+                "Enviar mensagem para o Administrador", key="admin_message_button"
+            ):
                 st.session_state.click_counter += 1
     else:
         placeholder.empty()
+        with placeholder.container():
+            st.balloons()
+            time.sleep(2)
+
+            st.image(TIRIRICAS_PATH, caption="BOA, JEGUE! :horse::crown:")
+            time.sleep(2)
+
+        placeholder.empty()
+
         run_app()
