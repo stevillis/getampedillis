@@ -389,4 +389,16 @@ if __name__ == "__main__":
         page_icon=":flipper:",
     )
 
-    run_app()
+    if "click_counter" not in st.session_state:
+        st.session_state.click_counter = 0
+
+    placeholder = st.empty()
+
+    if st.session_state.click_counter < 10:
+        with placeholder.container():
+            st.markdown("# 🚨 O SITE FOI DESATIVADO! 🚨")
+            if st.button("Enviar mensagem para o Administrador"):
+                st.session_state.click_counter += 1
+    else:
+        placeholder.empty()
+        run_app()
