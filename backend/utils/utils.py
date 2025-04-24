@@ -6,7 +6,7 @@ from typing import List
 import pandas as pd
 import streamlit as st
 
-from utils import PLAYERS_FOLDER, STYLES_FOLDER
+from backend.utils import PLAYERS_FOLDER, STYLES_FOLDER
 
 
 def pad_list(
