@@ -1,8 +1,8 @@
 import streamlit as st
 
-from utils import PLAYERS_FOLDER
-from utils.image_utils import get_or_create_image
-from utils.utils import get_players_df
+from backend.utils import PLAYERS_FOLDER
+from backend.utils.image_utils import get_or_create_image
+from backend.utils.utils import get_players_df
 
 if __name__ == "__main__":
     st.set_page_config(

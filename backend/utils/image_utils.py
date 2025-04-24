@@ -8,7 +8,7 @@ from typing import List, Optional, Tuple
 import boto3
 from PIL import Image
 
-from utils import S3_BUCKET_NAME, S3_REGION
+from backend.utils import S3_BUCKET_NAME, S3_REGION
 
 
 def create_blank_image(size: Tuple[int, int]) -> Image.Image:
