@@ -93,14 +93,6 @@ class StyleTournamentApp:
             key="style_tournament_data_input",
         )
 
-        input_tournament_style_image_size = st.selectbox(
-            label="Selecione o tamanho da imagem",
-            options=(32, 64, 94, 128),
-            index=2,
-            format_func=lambda x: f"{x}px",
-            key="input_tournament_style_image_size",
-        )
-
         if st.button(
             label="Criar imagem do Torneio de Estilos",
             key="create_tournament_style_image",
@@ -120,10 +112,7 @@ class StyleTournamentApp:
             st.session_state.player_styles_data = players_data
             composite_image = self.player_style_image_composer.compose(
                 players_data=players_data,
-                image_size=(
-                    input_tournament_style_image_size,
-                    input_tournament_style_image_size,
-                ),
+                image_size=(94, 94),
             )
 
             composite_image.save("generated_images/tournament_style_image.jpg")
@@ -174,14 +163,6 @@ class StyleTournamentApp:
             placeholder="jogador1, jogador2, jogador3\njogador4, jogador5, jogador6",
         )
 
-        input_team_style_image_size = st.selectbox(
-            label="Selecione o tamanho da imagem dos times",
-            options=(32, 64, 94, 128),
-            index=2,
-            format_func=lambda x: f"{x}px",
-            key="input_team_style_image_size",
-        )
-
         if st.button(
             label="Criar imagens dos Times de Estilos", key="create_team_style_images"
         ):
@@ -204,10 +185,7 @@ class StyleTournamentApp:
                 team_image = self.team_style_image_composer.compose_team(
                     team_members=team_members,
                     players_data=players_data,
-                    image_size=(
-                        input_team_style_image_size,
-                        input_team_style_image_size,
-                    ),
+                    image_size=(94, 94),
                 )
                 if team_image is not None:
                     team_image.save(f"generated_images/team_styles_{i+1}.jpg")

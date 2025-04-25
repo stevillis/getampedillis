@@ -163,14 +163,6 @@ class TournamentApp:
             key="tournament_data_input",
         )
 
-        input_tournament_image_size = st.selectbox(
-            label="Selecione o tamanho da imagem",
-            options=(32, 64, 94, 128),
-            index=2,
-            format_func=lambda x: f"{x}px",
-            key="input_tournament_image_size",
-        )
-
         if st.button(label="Criar imagem do Torneio", key="create_tournament_image"):
             if len(st.session_state.tournament_data_input) == 0:
                 st.error(
@@ -188,7 +180,7 @@ class TournamentApp:
             st.session_state.players_data = players_data
             composite_image = self.player_image_composer.compose(
                 players_data=players_data,
-                image_size=(input_tournament_image_size, input_tournament_image_size),
+                image_size=(94, 94),
             )
             composite_image.save("generated_images/tournament_image.jpg")
             st.session_state.composite_image = composite_image
@@ -237,14 +229,6 @@ class TournamentApp:
             placeholder="jogador1, jogador2, jogador3\njogador4, jogador5, jogador6",
         )
 
-        input_team_image_size = st.selectbox(
-            label="Selecione o tamanho da imagem",
-            options=(32, 64, 94, 128),
-            index=2,
-            format_func=lambda x: f"{x}px",
-            key="input_team_image_size",
-        )
-
         if st.button(label="Criar imagens dos Times", key="create_team_images"):
             if len(st.session_state.team_tournament_data_input) == 0:
                 st.error(
@@ -269,7 +253,7 @@ class TournamentApp:
                 team_image = self.team_image_composer.compose_team(
                     team_members=team_members,
                     players_data=players_data,
-                    image_size=(input_team_image_size, input_team_image_size),
+                    image_size=(94, 94),
                 )
 
                 if team_image is not None:
