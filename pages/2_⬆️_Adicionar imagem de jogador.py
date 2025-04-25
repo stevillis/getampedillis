@@ -1,8 +1,10 @@
+import os
+
 import streamlit as st
 
 from backend.utils import PLAYERS_FOLDER
-from backend.utils.image_utils import get_or_create_image
-from backend.utils.utils import get_players_df
+from backend.utils.image_utils import get_or_create_image, handle_player_image_upload
+from backend.utils.utils import load_players_df
 
 if __name__ == "__main__":
     st.set_page_config(
@@ -12,32 +14,37 @@ if __name__ == "__main__":
 
     st.markdown("## Adicionar imagens de jogadores")
 
-    uploaded_file = st.file_uploader(
-        label="Adicionar imagem de jogador",
-        type=["png", "jpg", "jpeg"],
-    )
+    env_token = os.environ.get("UPLOAD_IMAGE_TOKEN")
 
-    if uploaded_file is not None:
-        player_name_input = st.text_input(
-            label="Nome do jogador", key="player_name_input", max_chars=20
+    token_input = st.text_input("Token de acesso", type="password", key="token_input")
+    if env_token and token_input == env_token:
+        uploaded_file = st.file_uploader(
+            label="Adicionar imagem de jogador",
+            type=["png", "jpg", "jpeg"],
         )
-        if st.button(label="Fazer upload"):
-            if player_name_input == "":
-                st.error(
-                    """Coloque o nome do jogador, otário! Tá querendo ganhar
-                    título **JEGUE REI :horse::crown:**?
-                    """
-                )
-            else:
-                with open(f"{PLAYERS_FOLDER}/{player_name_input}.png", "wb") as f:
-                    f.write(uploaded_file.getvalue())
 
-                st.success("Imagem adicionada com sucesso!")
+        if uploaded_file is not None:
+            player_name_input = st.text_input(
+                label="Nome do jogador", key="player_name_input", max_chars=20
+            )
+            if st.button(label="Fazer upload"):
+                status, message = handle_player_image_upload(
+                    player_name=player_name_input,
+                    uploaded_file=uploaded_file,
+                    token_input=token_input,
+                )
+
+                if status == "error":
+                    st.error(message)
+                elif status == "success":
+                    st.success(message)
+    else:
+        st.info("Você precisa de um token para fazer upload. Solicite o administrador.")
 
     with st.sidebar:
         st.write("### Lista de jogadores")
         with st.container(height=250):
-            players_df = get_players_df()
+            players_df = load_players_df()
             num_cols = 5
             num_rows = (len(players_df) + num_cols - 1) // num_cols
 

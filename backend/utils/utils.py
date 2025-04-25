@@ -20,8 +20,7 @@ def pad_list(
     return lst
 
 
-@st.cache_data
-def get_players_df():
+def load_players_df():
     player_files = []
     for file in os.listdir(PLAYERS_FOLDER):
         if file.endswith(".png") or file.endswith(".jpg"):
@@ -31,6 +30,11 @@ def get_players_df():
 
     players_df = pd.DataFrame({"Name": player_files})
     return players_df.sort_values("Name")
+
+
+@st.cache_data
+def get_players_df():
+    return load_players_df()
 
 
 @st.cache_data
