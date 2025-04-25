@@ -5,10 +5,11 @@ Image processing utilities for tournament.
 from pathlib import Path
 from typing import List, Optional, Tuple
 
-import boto3
+# import boto3
 from PIL import Image
 
-from backend.utils import S3_BUCKET_NAME, S3_REGION
+# from backend.utils import S3_BUCKET_NAME, S3_REGION
+from backend.utils import PLAYERS_FOLDER
 
 
 def create_blank_image(size: Tuple[int, int]) -> Image.Image:
@@ -73,3 +74,31 @@ def get_or_create_image(
         return create_blank_image(size=size)
 
     return resize_image(image_path=image_path, size=size)
+
+
+def handle_player_image_upload(
+    player_name: str,
+    uploaded_file: object,
+) -> Tuple[str, str]:
+    """
+    Handles the upload of player image, checking for duplicated images.
+    Returns a tuple: (status, message)
+    """
+    if player_name.strip() == "":
+        return "error", (
+            """Coloque o nome do jogador, otário! Tá querendo ganhar\n"""
+            "título **JEGUE REI :horse::crown:**?\n"
+            ""
+        )
+
+    for ext in ["png", "jpg", "jpeg"]:
+        if (PLAYERS_FOLDER / f"{player_name}.{ext}").exists():
+            return "error", "Já existe uma imagem para este jogador!"
+
+    extension = uploaded_file.name.split(".")[-1].lower()
+    save_path = PLAYERS_FOLDER / f"{player_name}.{extension}"
+
+    with open(save_path, "wb") as f:
+        f.write(uploaded_file.getvalue())
+
+    return "success", "Imagem adicionada com sucesso!"
