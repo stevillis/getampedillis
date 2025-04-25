@@ -266,7 +266,7 @@ class TournamentApp:
 
 if __name__ == "__main__":
     st.set_page_config(
-        page_title="Lojas Boto Produções",
+        page_title="Criar imagens de acessórios",
         page_icon=":flipper:",
     )
 

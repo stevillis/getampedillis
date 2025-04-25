@@ -47,9 +47,21 @@ class StyleTournamentApp:
                                     f'<span style="font-size: 10px;">{player_name}</span>',
                                     unsafe_allow_html=True,
                                 )
+
             st.write("### Lista de estilos")
-            styles_df = get_styles_df()
-            st.dataframe(styles_df)
+
+            styles_df = get_styles_df().copy()
+            styles_df["Icon"] = styles_df["Name"].apply(
+                lambda x: f"https://github.com/stevillis/tournament_image_creator/blob/master/data/styles/{x}.png?raw=true"
+            )
+            st.data_editor(
+                styles_df,
+                width=500,
+                disabled=["Name", "Icon"],
+                column_config={
+                    "Icon": st.column_config.ImageColumn("Icon", help=""),
+                },
+            )
 
     def _render_tournament_section(self):
         st.markdown("## Criar imagens de estilos")
@@ -197,7 +209,7 @@ class StyleTournamentApp:
 
 if __name__ == "__main__":
     st.set_page_config(
-        page_title="Lojas Boto Produções",
+        page_title="Criar imagens de estilos",
         page_icon=":flipper:",
     )
 

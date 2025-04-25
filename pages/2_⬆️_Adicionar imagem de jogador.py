@@ -6,12 +6,15 @@ from backend.utils.utils import get_players_df
 
 if __name__ == "__main__":
     st.set_page_config(
-        page_title="Lojas Boto Produções",
+        page_title="Adicionar imagens de jogadores",
         page_icon=":flipper:",
     )
 
+    st.markdown("## Adicionar imagens de jogadores")
+
     uploaded_file = st.file_uploader(
-        label="Adicionar imagem de jogador", type=["png", "jpg", "jpeg"]
+        label="Adicionar imagem de jogador",
+        type=["png", "jpg", "jpeg"],
     )
 
     if uploaded_file is not None:
