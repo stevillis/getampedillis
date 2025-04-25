@@ -25,6 +25,7 @@ def create_column_image(images: List[Image.Image]) -> Image.Image:
     for img in images:
         column_image.paste(img, (0, y_offset))
         y_offset += img.height
+
     return column_image
 
 

@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from PIL import Image
 
 from backend.utils.image_utils import create_column_image, get_or_create_image
@@ -5,7 +7,7 @@ from backend.utils.utils import pad_list
 
 
 class GenericImageComposer:
-    def __init__(self, base_folder, modifier_folder):
+    def __init__(self, base_folder: Path, modifier_folder: Path):
         self.base_folder = base_folder
         self.modifier_folder = modifier_folder
 
