@@ -8,7 +8,7 @@ import pandas as pd
 import streamlit as st
 from PIL import Image
 
-from backend.image_composer import PlayerImageComposer, TeamImageComposer
+from backend.composers.image_composer import PlayerImageComposer, TeamImageComposer
 from backend.utils import (
     ACCESSORIES_FOLDER,
     ACCS_BY_YEAR_FILE,
@@ -19,7 +19,7 @@ from backend.utils import (
 from backend.utils.auth import require_login
 from backend.utils.image_utils import get_or_create_image
 from backend.utils.utils import get_players_df
-from backend.validators import TournamentDataValidator
+from backend.validators.tournament_validator import TournamentDataValidator
 
 
 @st.cache_data

@@ -1,14 +1,14 @@
 import streamlit as st
 from PIL import Image
 
-from backend.style_image_composer import (
+from backend.composers.style_image_composer import (
     PlayerStyleImageComposer,
     TeamStyleImageComposer,
 )
 from backend.utils import PLAYERS_FOLDER, STYLES_FOLDER
 from backend.utils.auth import require_login
 from backend.utils.utils import get_players_df, get_styles_df
-from backend.validators import TournamentDataValidator
+from backend.validators.tournament_validator import TournamentDataValidator
 
 
 class StyleTournamentApp:

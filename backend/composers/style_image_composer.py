@@ -1,4 +1,4 @@
-from backend.generic_image_composer import (
+from backend.composers.generic_image_composer import (
     GenericImageComposer,
     GenericTeamImageComposer,
 )
