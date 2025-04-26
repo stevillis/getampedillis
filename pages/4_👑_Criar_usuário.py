@@ -6,7 +6,7 @@ from backend.repository import user_repository
 from backend.utils.auth import require_login
 
 if __name__ == "__main__":
-    st.set_page_config(page_title="Criar Usuário (Admin)", page_icon=":crown:")
+    st.set_page_config(page_title="Criar Usuário (Admin)", page_icon=":flipper:")
     require_login("🔒Login.py")
 
     if st.session_state.get("role") != "admin":

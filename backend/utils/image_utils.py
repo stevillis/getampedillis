@@ -2,8 +2,11 @@
 Image processing utilities for tournament.
 """
 
+import random
 from pathlib import Path
 from typing import List, Optional, Tuple
+
+import numpy as np
 
 # import boto3
 from PIL import Image
@@ -28,6 +31,50 @@ def create_column_image(images: List[Image.Image]) -> Image.Image:
         y_offset += img.height
 
     return column_image
+
+
+def roulette_team_rows(
+    images: list,
+    num_rows: int,
+    row_height: int = 94,
+    avatar_row: int = 1,
+    rng=None,
+):
+    """
+    For each image, crops the avatar row and a randomly selected roulette row (excluding avatar_row).
+    Returns (roulette_row, avatar_rows, roulette_rows), where each is a list of PIL images.
+    """
+    if rng is None:
+        rng = random
+
+    height = images[0].height
+    max_possible_rows = height // row_height
+    valid_rows = [
+        i for i in range(num_rows) if i != (avatar_row - 1) and i < max_possible_rows
+    ]
+
+    if not valid_rows:
+        raise ValueError(
+            "Nenhuma linha válida para sortear. Verifique o número de linhas ou o tamanho da imagem."
+        )
+
+    roulette_row = rng.choice(valid_rows)
+    avatar_imgs = []
+    roulette_imgs = []
+    for img in images:
+        np_img = np.array(img)
+        avatar_crop = np_img[
+            (avatar_row - 1) * row_height : avatar_row * row_height, :, :
+        ]
+
+        roulette_crop = np_img[
+            roulette_row * row_height : (roulette_row + 1) * row_height, :, :
+        ]
+
+        avatar_imgs.append(Image.fromarray(avatar_crop))
+        roulette_imgs.append(Image.fromarray(roulette_crop))
+
+    return roulette_row, avatar_imgs, roulette_imgs
 
 
 def find_image(folder_path: Path, image_name: str) -> Optional[str]:
