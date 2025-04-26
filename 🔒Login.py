@@ -1,3 +1,5 @@
+import time
+
 import streamlit as st
 
 from backend.utils.auth import authenticate_user
@@ -5,13 +7,12 @@ from backend.utils.auth import authenticate_user
 
 def login_form():
     st.header("Login")
-    st.info(
-        "Para testar o site como visitante, use o usuário **guest** e a senha **guest**."
-    )
+
     username = st.text_input(
         "Usuário",
         key="login_username",
     )
+
     password = st.text_input(
         "Senha",
         type="password",
@@ -19,24 +20,37 @@ def login_form():
     )
 
     login_btn = st.button("Entrar", key="login_btn")
+
+    placeholder = st.empty()
+    with placeholder.container():
+        st.info(
+            "Para testar o site como visitante, use o usuário **guest** e a senha **guest**."
+        )
+
     if login_btn:
-        if username == "guest" and password == "guest":
+        success, role = authenticate_user(username, password)
+        if success:
+            placeholder.empty()
+
             st.session_state.logged_in = True
             st.session_state.login = username
-            st.session_state.role = "guest"
-            st.success("Login como visitante realizado com sucesso! Redirecionando...")
-            st.rerun()
-        else:
-            success, role = authenticate_user(username, password)
-            if success:
-                st.session_state.logged_in = True
-                st.session_state.login = username
-                st.session_state.role = role
+            st.session_state.role = role
+
+            if not st.session_state.get("showed_login_balloons", False):
+                st.balloons()
+                time.sleep(2)
+                st.session_state["showed_login_balloons"] = True
+
+            with placeholder.container():
                 st.success("Login realizado com sucesso! Redirecionando...")
-                st.rerun()  # Ensures session state is updated before redirect
-            else:
-                st.session_state.logged_in = False
-                st.error("Usuário ou senha incorretos.")
+                time.sleep(2)
+
+            placeholder.empty()
+
+            st.rerun()  # Ensures session state is updated before redirect
+        else:
+            st.session_state.logged_in = False
+            st.error("Usuário ou senha incorretos.")
 
 
 if __name__ == "__main__":
