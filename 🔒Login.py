@@ -38,12 +38,12 @@ def login_form():
 
             if not st.session_state.get("showed_login_balloons", False):
                 st.balloons()
-                time.sleep(2)
+                time.sleep(1)
                 st.session_state["showed_login_balloons"] = True
 
             with placeholder.container():
                 st.success("Login realizado com sucesso! Redirecionando...")
-                time.sleep(2)
+                time.sleep(1)
 
             placeholder.empty()
 

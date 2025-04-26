@@ -1,6 +1,6 @@
 from PIL import Image
 
-from backend.generic_image_composer import GenericImageComposer
+from backend.composers.generic_image_composer import GenericImageComposer
 from backend.utils.image_utils import (
     create_column_image,
     find_image,

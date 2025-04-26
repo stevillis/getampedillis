@@ -4,16 +4,16 @@ from unittest.mock import patch
 import pytest
 from PIL import Image
 
-from backend.generic_image_composer import (
+from backend.composers.generic_image_composer import (
     GenericImageComposer,
     GenericTeamImageComposer,
 )
-from backend.image_composer import PlayerImageComposer, TeamImageComposer
-from backend.style_image_composer import (
+from backend.composers.image_composer import PlayerImageComposer, TeamImageComposer
+from backend.composers.style_image_composer import (
     PlayerStyleImageComposer,
     TeamStyleImageComposer,
 )
-from backend.validators import TournamentDataValidator
+from backend.validators.tournament_validator import TournamentDataValidator
 
 
 @pytest.fixture
@@ -21,8 +21,8 @@ def dummy_image():
     return Image.new("RGB", (10, 20), (255, 255, 255))
 
 
-@patch("backend.generic_image_composer.get_or_create_image")
-@patch("backend.generic_image_composer.create_column_image")
+@patch("backend.composers.generic_image_composer.get_or_create_image")
+@patch("backend.composers.generic_image_composer.create_column_image")
 def test_generic_image_composer_compose(
     mock_create_column_image, mock_get_or_create_image, dummy_image
 ):
@@ -36,8 +36,8 @@ def test_generic_image_composer_compose(
     assert mock_create_column_image.call_count == 2
 
 
-@patch("backend.generic_image_composer.get_or_create_image")
-@patch("backend.generic_image_composer.create_column_image")
+@patch("backend.composers.generic_image_composer.get_or_create_image")
+@patch("backend.composers.generic_image_composer.create_column_image")
 def test_generic_team_image_composer_compose_team(
     mock_create_column_image, mock_get_or_create_image, dummy_image
 ):
