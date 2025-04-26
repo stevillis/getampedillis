@@ -2,6 +2,23 @@
 
 This project is a tool for generating images for teams and tournaments, specifically designed for GetAmped events. Users can input team and tournament data, and the app will automatically generate visually appealing images based on the provided information. It is ideal for organizers who want to quickly create shareable graphics for their events.
 
+## Authentication & permissions
+
+**User authentication is required to access the app.**
+- The app supports multiple user roles: `admin`, `player`, and `guest`.
+- Permissions and access to features are determined by your role.
+
+### Role-based Permissions
+- **Admin**: Can create new users, assign roles, and access the admin area.
+- **Player**: Can upload player images and access main features.
+- **Guest**: Has limited access, useful for testing or demo purposes.
+
+> **Guest login:** Use username `guest` and password `guest` to try the app as a guest.
+
+### Admin Area
+- Only users with the `admin` role can access the user creation page and manage user roles.
+- Admins can create new users and assign roles directly from the app interface.
+
 ## App preview
 
 You can try the app online here: [https://getampedvive.streamlit.app/](https://getampedvive.streamlit.app/)
@@ -41,7 +58,7 @@ pip install -r requirements.txt
 ### 6. Run the app
 Start the Streamlit app with:
 ```bash
-python -m streamlit run 🏠Home.py
+python -m streamlit run 🔒Login.py
 ```
 
 After running the above command, open your browser and go to [http://localhost:8501](http://localhost:8501/) to use the app.
