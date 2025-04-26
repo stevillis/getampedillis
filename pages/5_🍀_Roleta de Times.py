@@ -63,7 +63,7 @@ def get_roulette_settings():
 
 
 def show_roulette_results(roulette_row, avatar_imgs, roulette_results):
-    st.subheader(f"Resultado do Roulette: Linha {roulette_row}")
+    st.subheader(f"Resultado da Roleta: Linha {roulette_row}")
     result_cols = st.columns(2)
     for i in range(2):
         stacked = np.vstack([np.array(avatar_imgs[i]), np.array(roulette_results[i])])
