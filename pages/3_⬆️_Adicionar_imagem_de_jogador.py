@@ -1,5 +1,3 @@
-import os
-
 import streamlit as st
 
 from backend.utils import PLAYERS_FOLDER

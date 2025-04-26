@@ -1,0 +1,215 @@
+import numpy as np
+from PIL import Image
+
+from backend.utils.image_utils import (
+    create_column_image,
+    find_image,
+    get_or_create_image,
+    handle_player_image_upload,
+    resize_image,
+    roulette_team_rows,
+)
+
+
+class DummyUploadedFile:
+    def __init__(self, name: str, content: bytes):
+        self.name = name
+        self._content = content
+
+    def getvalue(self):
+        return self._content
+
+
+def test_create_column_image():
+    img1 = Image.new("RGB", (10, 10), (255, 0, 0))
+    img2 = Image.new("RGB", (10, 20), (0, 255, 0))
+    column = create_column_image([img1, img2])
+
+    assert column.size == (10, 30)
+
+
+def test_find_image_found_and_not_found(tmp_path):
+    # Found
+    img_path = tmp_path / "foo.png"
+    Image.new("RGB", (5, 5)).save(img_path)
+    result = find_image(tmp_path, "foo")
+
+    assert result == str(img_path)
+
+    # Not found
+    assert find_image(tmp_path, "bar") is None
+
+
+def test_resize_image(tmp_path):
+    img_path = tmp_path / "img.png"
+    Image.new("RGB", (10, 10)).save(img_path)
+    resized = resize_image(img_path, (5, 5))
+
+    assert resized.size == (5, 5)
+
+
+def test_get_or_create_image_found_and_blank(tmp_path):
+    # Found
+    img_path = tmp_path / "foo.png"
+    Image.new("RGB", (10, 10)).save(img_path)
+    out = get_or_create_image(tmp_path, "foo", (5, 5))
+
+    assert isinstance(out, Image.Image)
+    assert out.size == (5, 5)
+
+    # Not found
+    out2 = get_or_create_image(tmp_path, "bar", (5, 5))
+
+    assert isinstance(out2, Image.Image)
+    assert out2.size == (5, 5)
+
+
+def test_handle_player_image_upload_success(tmp_path, monkeypatch):
+    player_name = "player1"
+    img_content = b"fakeimagecontent"
+    uploaded_file = DummyUploadedFile(f"{player_name}.png", img_content)
+
+    monkeypatch.setattr("backend.utils.image_utils.PLAYERS_FOLDER", tmp_path)
+
+    status, msg = handle_player_image_upload(
+        player_name=player_name,
+        uploaded_file=uploaded_file,
+    )
+
+    assert status == "success"
+    assert "sucesso" in msg
+    assert (tmp_path / f"{player_name}.png").exists()
+
+    with open(tmp_path / f"{player_name}.png", "rb") as f:
+        assert f.read() == img_content
+
+
+def test_handle_player_image_upload_duplicate(tmp_path, monkeypatch):
+    player_name = "player1"
+    img_content = b"img"
+    (tmp_path / f"{player_name}.jpg").write_bytes(img_content)
+    uploaded_file = DummyUploadedFile(f"{player_name}.png", img_content)
+
+    monkeypatch.setattr("backend.utils.image_utils.PLAYERS_FOLDER", tmp_path)
+
+    status, msg = handle_player_image_upload(
+        player_name=player_name,
+        uploaded_file=uploaded_file,
+    )
+
+    assert status == "error"
+    assert "Já existe" in msg
+
+
+def test_handle_player_image_upload_empty_name(tmp_path, monkeypatch):
+    img_content = b"img"
+    uploaded_file = DummyUploadedFile("no_name.png", img_content)
+
+    monkeypatch.setattr("backend.utils.image_utils.PLAYERS_FOLDER", tmp_path)
+
+    status, msg = handle_player_image_upload(
+        player_name=" ",
+        uploaded_file=uploaded_file,
+    )
+
+    assert status == "error"
+    assert "Coloque o nome" in msg
+
+
+def test_roulette_team_rows_default_rng(monkeypatch):
+    # Test that default rng (None) uses random
+    called = {}
+
+    class DummyRandom:
+        def choice(self, seq):
+            called["used"] = True
+            return seq[0]
+
+    monkeypatch.setattr("random.choice", DummyRandom().choice)
+
+    row_height = 10
+    num_rows = 3
+    width = 10
+    height = row_height * num_rows
+    img = Image.new("RGB", (width, height))
+
+    for i, color in enumerate([(255, 0, 0), (0, 255, 0), (0, 0, 255)]):
+        for y in range(i * row_height, (i + 1) * row_height):
+            for x in range(width):
+                img.putpixel((x, y), color)
+
+    roulette_team_rows(
+        [img, img], num_rows=num_rows, row_height=row_height, avatar_row=1
+    )
+
+    assert called.get("used") is True
+
+
+def test_roulette_team_rows_no_valid_rows():
+    # Test ValueError if no valid rows
+    row_height = 10
+    num_rows = 1  # Only avatar row, no accessory rows
+    width = 10
+    height = row_height * num_rows
+    img = Image.new("RGB", (width, height))
+
+    try:
+        roulette_team_rows(
+            [img, img], num_rows=num_rows, row_height=row_height, avatar_row=1
+        )
+    except ValueError as e:
+        assert "Nenhuma linha válida" in str(e)
+    else:
+        assert False, "Expected ValueError for no valid rows"
+
+
+def test_roulette_team_rows_basic():
+    # Create two images with 3 rows (avatar + 2 accessories), 10x30, each row 10px tall
+    row_height = 10
+    num_rows = 3
+    width = 10
+    height = row_height * num_rows
+
+    # First image: red, green, blue rows
+    img1 = Image.new("RGB", (width, height))
+    for i, color in enumerate([(255, 0, 0), (0, 255, 0), (0, 0, 255)]):
+        for y in range(i * row_height, (i + 1) * row_height):
+            for x in range(width):
+                img1.putpixel((x, y), color)
+
+    # Second image: yellow, magenta, cyan rows
+    img2 = Image.new("RGB", (width, height))
+    for i, color in enumerate([(255, 255, 0), (255, 0, 255), (0, 255, 255)]):
+        for y in range(i * row_height, (i + 1) * row_height):
+            for x in range(width):
+                img2.putpixel((x, y), color)
+
+    # Use a fixed random seed for deterministic roulette
+    class DummyRNG:
+        def choice(self, seq):
+            return seq[0]  # always pick the first accessory row (index 1)
+
+    roulette_row, avatar_imgs, roulette_imgs = roulette_team_rows(
+        [img1, img2],
+        num_rows=num_rows,
+        row_height=row_height,
+        avatar_row=1,
+        rng=DummyRNG(),
+    )
+
+    assert roulette_row == 1
+
+    # Check avatar rows
+    for i, avatar_img in enumerate(avatar_imgs):
+        arr = np.array(avatar_img)
+        assert arr.shape == (row_height, width, 3)
+    # Check roulette rows
+    arr1 = np.array(roulette_imgs[0])
+    arr2 = np.array(roulette_imgs[1])
+
+    assert (
+        (arr1 == [0, 255, 0]).all(axis=2).any()
+    ), "First image's roulette row should be green"
+    assert (
+        (arr2 == [255, 0, 255]).all(axis=2).any()
+    ), "Second image's roulette row should be magenta"
