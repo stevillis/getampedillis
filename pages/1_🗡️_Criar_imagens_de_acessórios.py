@@ -16,6 +16,7 @@ from backend.utils import (
     SHOW_TROLL_INTRO,
     TIRIRICAS_PATH,
 )
+from backend.utils.auth import require_login
 from backend.utils.image_utils import get_or_create_image
 from backend.utils.utils import get_players_df
 from backend.validators import TournamentDataValidator
@@ -70,6 +71,11 @@ class TournamentApp:
         self.validator = TournamentDataValidator()
 
     def run(self):
+        # Check login state before rendering app
+        if not st.session_state.get("logged_in", False):
+            st.warning("Você precisa estar logado para acessar o app.")
+            return
+
         self._render_sidebar()
         self._render_tournament_section()
         self._render_team_section()
@@ -265,6 +271,8 @@ class TournamentApp:
 
 
 if __name__ == "__main__":
+    require_login("🔒Login.py")
+
     st.set_page_config(
         page_title="Criar imagens de acessórios",
         page_icon=":flipper:",

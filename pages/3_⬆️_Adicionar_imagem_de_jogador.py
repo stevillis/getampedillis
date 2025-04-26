@@ -3,10 +3,13 @@ import os
 import streamlit as st
 
 from backend.utils import PLAYERS_FOLDER
+from backend.utils.auth import require_login
 from backend.utils.image_utils import get_or_create_image, handle_player_image_upload
 from backend.utils.utils import load_players_df
 
 if __name__ == "__main__":
+    require_login("🔒Login.py")
+
     st.set_page_config(
         page_title="Adicionar imagens de jogadores",
         page_icon=":flipper:",
@@ -14,10 +17,7 @@ if __name__ == "__main__":
 
     st.markdown("## Adicionar imagens de jogadores")
 
-    env_token = os.environ.get("UPLOAD_IMAGE_TOKEN")
-
-    token_input = st.text_input("Token de acesso", type="password", key="token_input")
-    if env_token and token_input == env_token:
+    if st.session_state.get("role") in ("admin", "player"):
         uploaded_file = st.file_uploader(
             label="Adicionar imagem de jogador",
             type=["png", "jpg", "jpeg"],
@@ -31,7 +31,6 @@ if __name__ == "__main__":
                 status, message = handle_player_image_upload(
                     player_name=player_name_input,
                     uploaded_file=uploaded_file,
-                    token_input=token_input,
                 )
 
                 if status == "error":
@@ -39,7 +38,7 @@ if __name__ == "__main__":
                 elif status == "success":
                     st.success(message)
     else:
-        st.info("Você precisa de um token para fazer upload. Solicite o administrador.")
+        st.info("Você não tem permissão para fazer upload de imagens de jogadores.")
 
     with st.sidebar:
         st.write("### Lista de jogadores")
