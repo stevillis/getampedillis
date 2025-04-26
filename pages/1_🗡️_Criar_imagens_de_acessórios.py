@@ -2,20 +2,12 @@
 Module for the creating images for GetAmped Tournament.
 """
 
-import time
-
 import pandas as pd
 import streamlit as st
 from PIL import Image
 
 from backend.composers.image_composer import PlayerImageComposer, TeamImageComposer
-from backend.utils import (
-    ACCESSORIES_FOLDER,
-    ACCS_BY_YEAR_FILE,
-    PLAYERS_FOLDER,
-    SHOW_TROLL_INTRO,
-    TIRIRICAS_PATH,
-)
+from backend.utils import ACCESSORIES_FOLDER, ACCS_BY_YEAR_FILE, PLAYERS_FOLDER
 from backend.utils.auth import require_login
 from backend.utils.image_utils import get_or_create_image
 from backend.utils.utils import get_players_df
@@ -278,36 +270,4 @@ if __name__ == "__main__":
         page_icon=":flipper:",
     )
 
-    if SHOW_TROLL_INTRO:
-        if "click_counter" not in st.session_state:
-            st.session_state.click_counter = 0
-
-        if "showed_balloons" not in st.session_state:
-            st.session_state.showed_balloons = 0
-
-        placeholder = st.empty()
-
-        if st.session_state.click_counter < 9:
-            with placeholder.container():
-                st.markdown("# 🚨 O SITE FOI DESATIVADO! 🚨")
-                if st.button(
-                    "Enviar mensagem para o Administrador", key="admin_message_button"
-                ):
-                    st.session_state.click_counter += 1
-        else:
-            if st.session_state.showed_balloons == 0:
-                placeholder.empty()
-                with placeholder.container():
-                    st.balloons()
-                    time.sleep(2)
-
-                    st.image(TIRIRICAS_PATH, caption="BOA, JEGUE! :horse::crown:")
-                    time.sleep(2)
-
-                    st.session_state.showed_balloons = 1
-
-                placeholder.empty()
-
-            TournamentApp().run()
-    else:
-        TournamentApp().run()
+    TournamentApp().run()
