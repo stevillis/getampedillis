@@ -1,6 +1,5 @@
 """Utility functions for list manipulation and other general-purpose operations."""
 
-import logging
 import os
 import random
 from collections import defaultdict
@@ -10,8 +9,6 @@ import pandas as pd
 import streamlit as st
 
 from backend.utils import PLAYERS_FOLDER, STYLES_FOLDER
-
-logging.basicConfig(level=logging.DEBUG)
 
 
 def parse_teams_from_text(text: str):
@@ -53,7 +50,7 @@ def assign_unique_styles_to_players(
                 style_name = f"{style}{version}"
                 player_style_pairs.append([player, style_name])
 
-    logging.debug(player_style_pairs)
+    print(f"DEBUG player_style_pairs: {player_style_pairs}")
     return player_style_pairs
 
 
