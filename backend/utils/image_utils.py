@@ -38,11 +38,15 @@ def roulette_team_rows(
     num_rows: int,
     row_height: int = 94,
     avatar_row: int = 1,
+    num_accessory_rows: int = 1,
     rng=None,
 ):
     """
-    For each image, crops the avatar row and a randomly selected roulette row (excluding avatar_row).
-    Returns (roulette_row, avatar_rows, roulette_rows), where each is a list of PIL images.
+    For each image, crops the avatar row and N randomly selected accessory rows (excluding avatar_row).
+    Returns (sampled_rows, avatar_imgs, accessory_imgs), where:
+        - sampled_rows: list of int (row indices sampled for accessories)
+        - avatar_imgs: list of PIL.Image (one per image)
+        - accessory_imgs: list of lists of PIL.Image (one list per image, each containing N accessory rows)
     """
     if rng is None:
         rng = random
@@ -53,28 +57,28 @@ def roulette_team_rows(
         i for i in range(num_rows) if i != (avatar_row - 1) and i < max_possible_rows
     ]
 
-    if not valid_rows:
+    if not valid_rows or num_accessory_rows > len(valid_rows):
         raise ValueError(
-            "Nenhuma linha válida para sortear. Verifique o número de linhas ou o tamanho da imagem."
+            "Quantidade de linhas de acessórios inválida. Verifique o número de linhas ou o tamanho da imagem."
         )
 
-    roulette_row = rng.choice(valid_rows)
+    sampled_rows = rng.sample(valid_rows, num_accessory_rows)
+    sampled_rows.sort()  # For visual consistency
     avatar_imgs = []
-    roulette_imgs = []
+    accessory_imgs = []
     for img in images:
         np_img = np.array(img)
         avatar_crop = np_img[
             (avatar_row - 1) * row_height : avatar_row * row_height, :, :
         ]
-
-        roulette_crop = np_img[
-            roulette_row * row_height : (roulette_row + 1) * row_height, :, :
-        ]
-
         avatar_imgs.append(Image.fromarray(avatar_crop))
-        roulette_imgs.append(Image.fromarray(roulette_crop))
+        acc_list = []
+        for row in sampled_rows:
+            acc_crop = np_img[row * row_height : (row + 1) * row_height, :, :]
+            acc_list.append(Image.fromarray(acc_crop))
+        accessory_imgs.append(acc_list)
 
-    return roulette_row, avatar_imgs, roulette_imgs
+    return sampled_rows, avatar_imgs, accessory_imgs
 
 
 def find_image(folder_path: Path, image_name: str) -> Optional[str]:
