@@ -2,6 +2,7 @@
 Image processing utilities for tournament.
 """
 
+import logging
 import random
 from pathlib import Path
 from typing import List, Optional, Tuple
@@ -12,6 +13,8 @@ from PIL import Image, ImageDraw
 
 # from backend.utils import S3_BUCKET_NAME, S3_REGION
 from backend.utils import PLAYERS_FOLDER
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 def create_blank_image(size: Tuple[int, int]) -> Image.Image:
@@ -121,6 +124,7 @@ def get_or_create_image(
     """Finds an image or creates a blank one if not found."""
     image_path = find_image(folder_path, image_name)
     if image_path is None:
+        logging.debug(f"Image not found: {image_name}")
         return create_blank_image(size=size)
 
     return resize_image(image_path=image_path, size=size)
