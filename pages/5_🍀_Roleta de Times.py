@@ -44,29 +44,41 @@ def get_roulette_settings():
         unsafe_allow_html=True,
     )
 
-    col1, col2 = st.columns([1, 1])
+    col1, col2, col3 = st.columns([1, 1, 1])
     with col1:
         num_rows = st.number_input(
-            "Número de linhas na imagem (incluindo players)",
+            "Linhas na imagem (inclui players)",
             min_value=2,
             max_value=20,
             value=8,
         )
+    with col2:
+        num_accessory_rows = st.number_input(
+            "Quantidade de linhas a sortear",
+            min_value=1,
+            max_value=num_rows - 1,
+            value=1,
+        )
 
     roulette_clicked = False
-    with col2:
+    with col3:
         st.markdown('<div class="button-bottom-container">', unsafe_allow_html=True)
         roulette_clicked = st.button("Sortear!")
         st.markdown("</div>", unsafe_allow_html=True)
 
-    return num_rows, roulette_clicked
+    return num_rows, num_accessory_rows, roulette_clicked
 
 
-def show_roulette_results(roulette_row, avatar_imgs, roulette_results):
-    st.subheader(f"Resultado da Roleta: Linha {roulette_row}")
+def show_roulette_results(sampled_rows, avatar_imgs, accessory_imgs):
+    st.subheader(
+        f"Linhas de acessórios sorteadas: {', '.join(str(r) for r in sampled_rows)}"
+    )
     result_cols = st.columns(2)
     for i in range(2):
-        stacked = np.vstack([np.array(avatar_imgs[i]), np.array(roulette_results[i])])
+        # Stack avatar row + all accessory rows
+        stacked = np.vstack(
+            [np.array(avatar_imgs[i]), *[np.array(acc) for acc in accessory_imgs[i]]]
+        )
         result_cols[i].image(stacked, caption=f"Time {i+1}", width=300)
 
 
@@ -84,22 +96,23 @@ if __name__ == "__main__":
     if len(team_images) == 2:
         show_team_previews(team_images)
 
-        num_rows, roulette_clicked = get_roulette_settings()
+        num_rows, num_accessory_rows, roulette_clicked = get_roulette_settings()
 
-        roulette_row = None
+        sampled_rows = None
         avatar_imgs = []
-        roulette_results = []
+        accessory_imgs = []
         if roulette_clicked:
             try:
-                roulette_row, avatar_imgs, roulette_results = roulette_team_rows(
+                sampled_rows, avatar_imgs, accessory_imgs = roulette_team_rows(
                     team_images,
                     num_rows=num_rows,
                     row_height=94,
+                    num_accessory_rows=num_accessory_rows,
                 )
             except Exception as e:
                 st.error(str(e))
 
-        if roulette_results and roulette_row is not None:
-            show_roulette_results(roulette_row, avatar_imgs, roulette_results)
+        if accessory_imgs:
+            show_roulette_results(sampled_rows, avatar_imgs, accessory_imgs)
     else:
         st.info("Carregue as imagens dos dois times para começar.")

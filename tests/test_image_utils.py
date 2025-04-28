@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 from PIL import Image
 
 from backend.utils.image_utils import (
@@ -121,11 +122,11 @@ def test_roulette_team_rows_default_rng(monkeypatch):
     called = {}
 
     class DummyRandom:
-        def choice(self, seq):
+        def sample(self, seq, k):
             called["used"] = True
-            return seq[0]
+            return seq[:k]
 
-    monkeypatch.setattr("random.choice", DummyRandom().choice)
+    monkeypatch.setattr("random.sample", DummyRandom().sample)
 
     row_height = 10
     num_rows = 3
@@ -139,7 +140,11 @@ def test_roulette_team_rows_default_rng(monkeypatch):
                 img.putpixel((x, y), color)
 
     roulette_team_rows(
-        [img, img], num_rows=num_rows, row_height=row_height, avatar_row=1
+        [img, img],
+        num_rows=num_rows,
+        row_height=row_height,
+        avatar_row=1,
+        num_accessory_rows=1,
     )
 
     assert called.get("used") is True
@@ -153,14 +158,15 @@ def test_roulette_team_rows_no_valid_rows():
     height = row_height * num_rows
     img = Image.new("RGB", (width, height))
 
-    try:
+    with pytest.raises(ValueError) as excinfo:
         roulette_team_rows(
-            [img, img], num_rows=num_rows, row_height=row_height, avatar_row=1
+            [img, img],
+            num_rows=num_rows,
+            row_height=row_height,
+            avatar_row=1,
+            num_accessory_rows=1,
         )
-    except ValueError as e:
-        assert "Nenhuma linha válida" in str(e)
-    else:
-        assert False, "Expected ValueError for no valid rows"
+    assert "Quantidade de linhas de acessório" in str(excinfo.value)
 
 
 def test_roulette_team_rows_basic():
@@ -186,30 +192,32 @@ def test_roulette_team_rows_basic():
 
     # Use a fixed random seed for deterministic roulette
     class DummyRNG:
-        def choice(self, seq):
-            return seq[0]  # always pick the first accessory row (index 1)
+        def sample(self, seq, k):
+            return seq[:k]  # always pick the first k accessory rows
 
-    roulette_row, avatar_imgs, roulette_imgs = roulette_team_rows(
+    sampled_rows, avatar_imgs, accessory_imgs = roulette_team_rows(
         [img1, img2],
         num_rows=num_rows,
         row_height=row_height,
         avatar_row=1,
         rng=DummyRNG(),
+        num_accessory_rows=1,
     )
 
-    assert roulette_row == 1
+    assert sampled_rows == [1]
 
     # Check avatar rows
     for i, avatar_img in enumerate(avatar_imgs):
         arr = np.array(avatar_img)
         assert arr.shape == (row_height, width, 3)
-    # Check roulette rows
-    arr1 = np.array(roulette_imgs[0])
-    arr2 = np.array(roulette_imgs[1])
+
+    # Check accessory rows
+    arr1 = np.array(accessory_imgs[0][0])
+    arr2 = np.array(accessory_imgs[1][0])
 
     assert (
         (arr1 == [0, 255, 0]).all(axis=2).any()
-    ), "First image's roulette row should be green"
+    ), "First image's accessory row should be green"
     assert (
         (arr2 == [255, 0, 255]).all(axis=2).any()
-    ), "Second image's roulette row should be magenta"
+    ), "Second image's accessory row should be magenta"
