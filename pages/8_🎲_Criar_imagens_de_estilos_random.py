@@ -126,7 +126,7 @@ def render_team_images_grid(
 
 
 if __name__ == "__main__":
-    # require_login("🔒Login.py")
+    require_login("🔒Login.py")
 
     st.set_page_config(
         page_title="Criar imagens de estilos random", page_icon=":game_die:"
@@ -138,7 +138,6 @@ if __name__ == "__main__":
         PLAYERS_FOLDER, STYLES_FOLDER
     )
 
-    # Inputs in the same line
     col1, col2 = st.columns([1, 2])
     with col1:
         num_styles_per_player = st.number_input(
@@ -149,6 +148,7 @@ if __name__ == "__main__":
             step=1,
             key="num_styles_per_player_random_style",
         )
+
     with col2:
         selected_categories = st.multiselect(
             "Categorias de estilos",
@@ -157,7 +157,6 @@ if __name__ == "__main__":
             key="category_multiselect_random_style",
         )
 
-    # --- UI for selecting players and teams (before the button) ---
     players_df = get_players_df()
     player_options = players_df["Name"].tolist()
     selected_players = st.multiselect(
@@ -189,7 +188,6 @@ if __name__ == "__main__":
         key="team_input_random_style",
     )
 
-    # Draw styles button AFTER the team input
     if st.button("Sortear", key="draw_styles_btn"):
         team_input = st.session_state.get("team_input_random_style", "")
         if not team_input.strip():
