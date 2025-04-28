@@ -6,10 +6,9 @@ import random
 from pathlib import Path
 from typing import List, Optional, Tuple
 
-import numpy as np
-
 # import boto3
-from PIL import Image
+import numpy as np
+from PIL import Image, ImageDraw
 
 # from backend.utils import S3_BUCKET_NAME, S3_REGION
 from backend.utils import PLAYERS_FOLDER
@@ -125,6 +124,65 @@ def get_or_create_image(
         return create_blank_image(size=size)
 
     return resize_image(image_path=image_path, size=size)
+
+
+def apply_transparent_gray(img, alpha=200):
+    """
+    Apply a semi-transparent gray overlay to a PIL image.
+    """
+    overlay = Image.new("RGBA", img.size, (60, 60, 60, alpha))
+    img_rgba = img.convert("RGBA")
+    blended = Image.alpha_composite(img_rgba, overlay)
+
+    return blended.convert("RGB")
+
+
+def get_num_rows(image, row_height=94):
+    """
+    Calculate the number of rows in an image given a row height.
+    """
+    return image.height // row_height
+
+
+def draw_row_numbers(image, excluded_rows, row_height=94):
+    """
+    Draw row numbers and gray out excluded rows on the image.
+    """
+    img = image.copy()
+    draw = ImageDraw.Draw(img)
+    num_rows = get_num_rows(img, row_height)
+    for i in range(num_rows):
+        y0 = i * row_height
+        y1 = y0 + row_height
+        color = (200, 200, 200, 180) if i in excluded_rows else (255, 255, 255, 180)
+
+        # Draw background for number
+        draw.rectangle([0, y0, 40, y1], fill=color)
+
+        # Draw row number
+        draw.text((8, y0 + row_height // 3), str(i), fill="black")
+
+        # Gray out excluded row
+        if i in excluded_rows:
+            draw.rectangle([40, y0, img.width, y1], fill=(180, 180, 180, 120))
+
+    return img
+
+
+def remove_rows(image, excluded_rows, row_height=94):
+    """
+    Remove specified rows from the image and return the new image.
+    """
+    num_rows = get_num_rows(image, row_height)
+    rows = [i for i in range(num_rows) if i not in excluded_rows]
+    if not rows:
+        return None
+
+    arr = np.array(image)
+    new_img_rows = [arr[i * row_height : (i + 1) * row_height, :, :] for i in rows]
+    new_arr = np.vstack(new_img_rows)
+
+    return Image.fromarray(new_arr)
 
 
 def handle_player_image_upload(
