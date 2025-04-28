@@ -3,13 +3,78 @@ import pytest
 from PIL import Image
 
 from backend.utils.image_utils import (
+    apply_transparent_gray,
     create_column_image,
+    draw_row_numbers,
     find_image,
+    get_num_rows,
     get_or_create_image,
     handle_player_image_upload,
+    remove_rows,
     resize_image,
     roulette_team_rows,
 )
+
+
+def test_apply_transparent_gray():
+    img = Image.new("RGB", (10, 10), (100, 100, 100))
+    out = apply_transparent_gray(img, alpha=128)
+
+    assert isinstance(out, Image.Image)
+
+    # Should not be identical to the original
+    assert out.tobytes() != img.tobytes()
+
+
+def test_get_num_rows():
+    img = Image.new("RGB", (10, 30))
+
+    assert get_num_rows(img, row_height=10) == 3
+    assert get_num_rows(img, row_height=15) == 2
+
+
+def test_draw_row_numbers():
+    img = Image.new("RGBA", (50, 30), (255, 255, 255, 255))
+    out = draw_row_numbers(img, excluded_rows=[1], row_height=10)
+
+    assert isinstance(out, Image.Image)
+
+    # Check that excluded row is grayed out (not pure white)
+    arr = np.array(out)
+
+    # The first pixel of row 1 (excluded) should not be pure white
+    assert not (arr[10, 45] == [255, 255, 255, 255]).all()
+
+
+def test_remove_rows():
+    # Create image with 3 colored rows
+    img = Image.new("RGB", (5, 15))
+    for y in range(5):
+        img.putpixel((0, y), (255, 0, 0))  # Row 0
+
+    for y in range(5, 10):
+        img.putpixel((0, y), (0, 255, 0))  # Row 1
+
+    for y in range(10, 15):
+        img.putpixel((0, y), (0, 0, 255))  # Row 2
+
+    # Remove row 1
+    out = remove_rows(img, excluded_rows=[1], row_height=5)
+
+    assert isinstance(out, Image.Image)
+
+    arr = np.array(out)
+
+    # Should have only rows 0 and 2
+    assert arr.shape[0] == 10
+
+    # Top pixel should be red, bottom should be blue
+
+    assert (arr[0, 0] == [255, 0, 0]).all()
+    assert (arr[-1, 0] == [0, 0, 255]).all()
+
+    # Remove all rows
+    assert remove_rows(img, excluded_rows=[0, 1, 2], row_height=5) is None
 
 
 class DummyUploadedFile:
