@@ -98,9 +98,11 @@ def test_find_image_found_and_not_found(tmp_path):
     # Found
     img_path = tmp_path / "foo.png"
     Image.new("RGB", (5, 5)).save(img_path)
-    result = find_image(tmp_path, "foo")
 
-    assert result == str(img_path)
+    # Test different cases
+    assert find_image(tmp_path, "foo") == str(img_path)
+    assert find_image(tmp_path, "FOO") == str(img_path)
+    assert find_image(tmp_path, "FoO") == str(img_path)
 
     # Not found
     assert find_image(tmp_path, "bar") is None
@@ -118,14 +120,14 @@ def test_get_or_create_image_found_and_blank(tmp_path):
     # Found
     img_path = tmp_path / "foo.png"
     Image.new("RGB", (10, 10)).save(img_path)
-    out = get_or_create_image(tmp_path, "foo", (5, 5))
-
-    assert isinstance(out, Image.Image)
-    assert out.size == (5, 5)
+    # Test different cases
+    for case in ["foo", "FOO", "FoO"]:
+        out = get_or_create_image(tmp_path, case, (5, 5))
+        assert isinstance(out, Image.Image)
+        assert out.size == (5, 5)
 
     # Not found
     out2 = get_or_create_image(tmp_path, "bar", (5, 5))
-
     assert isinstance(out2, Image.Image)
     assert out2.size == (5, 5)
 
