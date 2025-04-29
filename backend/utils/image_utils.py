@@ -82,13 +82,13 @@ def roulette_team_rows(
 
 
 def find_image(folder_path: Path, image_name: str) -> Optional[str]:
-    """Finds an image locally or downloads from S3 and caches it locally."""
-    # Always use lowercase for image_name to ensure case-insensitive lookup
-    image_name = image_name.lower()
+    """Finds an image locally (case-insensitive) or downloads from S3 and caches it locally."""
+    # Case-insensitive local file search
+    image_name_lower = image_name.lower()
     for ext in [".png", ".jpg"]:
-        local_path = folder_path / f"{image_name}{ext}"
-        if local_path.exists():
-            return str(local_path)
+        for file in folder_path.glob(f"*{ext}"):
+            if file.stem.lower() == image_name_lower:
+                return str(file)
 
     # If not found locally, try S3
     # s3 = boto3.client("s3", region_name=S3_REGION)
