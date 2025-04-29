@@ -50,7 +50,6 @@ def assign_unique_styles_to_players(
                 style_name = f"{style}{version}"
                 player_style_pairs.append([player, style_name])
 
-    print(f"DEBUG player_style_pairs: {player_style_pairs}")
     return player_style_pairs
 
 
