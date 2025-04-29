@@ -121,7 +121,6 @@ def get_or_create_image(
     """Finds an image or creates a blank one if not found."""
     image_path = find_image(folder_path, image_name)
     if image_path is None:
-        print(f"DEBUG: Image not found: {image_name}")
         return create_blank_image(size=size)
 
     return resize_image(image_path=image_path, size=size)
