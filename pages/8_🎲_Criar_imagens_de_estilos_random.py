@@ -46,7 +46,7 @@ STYLE_CATEGORIES = {
     "RIVAL": [
         "Corrupt",
         "Veteran",
-        "DSG",
+        "dsg",
         "Demon",
         "Fortress",
         "Sorcerer",
