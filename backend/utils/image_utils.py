@@ -6,7 +6,6 @@ import random
 from pathlib import Path
 from typing import List, Optional, Tuple
 
-# import boto3
 import numpy as np
 import streamlit as st
 from PIL import Image, ImageDraw
@@ -85,29 +84,16 @@ def find_image(folder_path: Path, image_name: str) -> Optional[str]:
     """Finds an image locally (case-insensitive) or downloads from S3 and caches it locally."""
     # Case-insensitive local file search
     image_name_lower = image_name.lower()
+    found = None
+    stems = []
     for ext in [".png", ".jpg"]:
         for file in folder_path.glob(f"*{ext}"):
+            stems.append(file.stem)
             if file.stem.lower() == image_name_lower:
-                return str(file)
+                found = str(file)
 
-    # If not found locally, try S3
-    # s3 = boto3.client("s3", region_name=S3_REGION)
-    # folder = folder_path.name  # "players", "accs", or "styles"
-    # for ext in [".png", ".jpg"]:
-    #     key = f"{folder}/{image_name}{ext}"
-    #     try:
-    #         response = s3.get_object(Bucket=S3_BUCKET_NAME, Key=key)
-    #         # Save to local file for future use
-    #         local_path = folder_path / f"{image_name}{ext}"
-    #         with open(local_path, "wb") as f:
-    #             f.write(response["Body"].read())
-    #         return str(local_path)
-    #     except s3.exceptions.NoSuchKey:
-    #         continue
-    #     except Exception:
-    #         continue
-
-    return None
+    st.write(f"[find_image] Searched for: {image_name_lower}, available: {stems}")
+    return found
 
 
 def resize_image(image_path: Path, size: Tuple[int, int]) -> Image.Image:
