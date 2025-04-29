@@ -82,7 +82,8 @@ def roulette_team_rows(
 
 def find_image(folder_path: Path, image_name: str) -> Optional[str]:
     """Finds an image locally or downloads from S3 and caches it locally."""
-    # Check for local file first
+    # Always use lowercase for image_name to ensure case-insensitive lookup
+    image_name = image_name.lower()
     for ext in [".png", ".jpg"]:
         local_path = folder_path / f"{image_name}{ext}"
         if local_path.exists():
@@ -119,9 +120,10 @@ def get_or_create_image(
     folder_path: Path, image_name: str, size: Tuple[int, int]
 ) -> Image.Image:
     """Finds an image or creates a blank one if not found."""
+    # Always use lowercase for image_name to ensure case-insensitive lookup
+    image_name = image_name.lower()
     image_path = find_image(folder_path, image_name)
     if image_path is None:
-        print(f"DEBUG: Image not found: {image_name}")
         return create_blank_image(size=size)
 
     return resize_image(image_path=image_path, size=size)
