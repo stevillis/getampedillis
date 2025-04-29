@@ -131,6 +131,8 @@ def get_or_create_image(
     folder_path: Path, image_name: str, size: Tuple[int, int]
 ) -> Image.Image:
     """Finds an image or creates a blank one if not found."""
+    # Always use lowercase for image_name to ensure case-insensitive lookup
+    image_name = image_name.lower()
     image_path = find_image(folder_path, image_name)
     st.write(
         f"[get_or_create_image] folder={folder_path}, image_name={image_name}, found={image_path}"

@@ -42,9 +42,7 @@ def test_assign_unique_styles_to_players():
             styles = [pairs[idx + i][1] for i in range(num_styles)]
 
             assert len(styles) == num_styles
-            assert len(styles) == len(
-                set(styles)
-            )  # no repeats for same player in same team occurrence
+            assert len(styles) == len(set(styles))
 
             idx += num_styles
 
@@ -53,6 +51,32 @@ def test_assign_unique_styles_to_players():
     assign_unique_styles_to_players(teams, ["A"], 2, warn_func=warnings.append)
 
     assert warnings
+
+
+def test_assign_unique_styles_to_players_case_insensitive():
+    # Player and style names with mixed case
+    teams = [["Alice", "BOB"], ["bob", "Carol"]]
+    style_pool = ["STYLE1", "style2", "Style3", "STYLE4"]
+    num_styles = 2
+    pairs = assign_unique_styles_to_players(teams, style_pool, num_styles)
+
+    # Each player in each team occurrence should get num_styles assignments
+    expected = sum(len(team) for team in teams) * num_styles
+    assert len(pairs) == expected
+
+    # Ensure all assigned styles are present in the pool (ignoring version suffix), regardless of case
+    style_pool_lower = set(s.lower() for s in style_pool)
+    for _, style in pairs:
+        # Remove version suffix (A/B)
+        base_style = style[:-1]
+        assert base_style.lower() in style_pool_lower
+
+        # Suffix must be 'A' or 'B'
+        assert style[-1] in ("A", "B")
+
+    # Ensure player names are preserved as given
+    for player, _ in pairs:
+        assert player in ["Alice", "BOB", "bob", "Carol"]
 
 
 def test_build_image_columns():
@@ -69,6 +93,12 @@ def test_build_image_columns():
 
     # Empty input
     assert build_image_columns([], []) == []
+
+    # Explicitly test single player branch
+    single_team = [["alice"]]
+    single_player_style_pairs = [["alice", "Style1"], ["alice", "Style2"]]
+    columns_single = build_image_columns(single_team, single_player_style_pairs)
+    assert columns_single == [["alice", "Style1", "Style2"]]
 
 
 def test_pad_list_behavior():
