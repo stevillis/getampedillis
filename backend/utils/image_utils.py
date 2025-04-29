@@ -7,10 +7,8 @@ from pathlib import Path
 from typing import List, Optional, Tuple
 
 import numpy as np
-import streamlit as st
 from PIL import Image, ImageDraw
 
-# from backend.utils import S3_BUCKET_NAME, S3_REGION
 from backend.utils import PLAYERS_FOLDER
 
 
@@ -92,24 +90,17 @@ def find_image(folder_path: Path, image_name: str) -> Optional[str]:
             if file.stem.lower() == image_name_lower:
                 found = str(file)
 
-    st.write(f"[find_image] Searched for: {image_name_lower}, available: {stems}")
     return found
 
 
 def resize_image(image_path: Path, size: Tuple[int, int]) -> Image.Image:
     """Resizes an image to the specified size."""
-    st.write(
-        f"[resize_image] Resizing image: {image_path} (type: {type(image_path)}) to size {size}"
-    )
     try:
         img = Image.open(image_path)
-        st.write(f"[resize_image] Original mode: {img.mode}, size: {img.size}")
         img = img.convert("RGB")  # Ensure compatibility
         img = img.resize(size)
-        st.write(f"[resize_image] Resized image size: {img.size}")
         return img
     except Exception as e:
-        st.error(f"[resize_image] Error resizing image {image_path}: {e}")
         raise
 
 
@@ -120,12 +111,9 @@ def get_or_create_image(
     # Always use lowercase for image_name to ensure case-insensitive lookup
     image_name = image_name.lower()
     image_path = find_image(folder_path, image_name)
-    st.write(
-        f"[get_or_create_image] folder={folder_path}, image_name={image_name}, found={image_path}"
-    )
     if image_path is None:
-        st.write("[get_or_create_image] Returning blank image")
         return create_blank_image(size=size)
+
     return resize_image(image_path=image_path, size=size)
 
 
