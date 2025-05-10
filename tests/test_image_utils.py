@@ -108,6 +108,12 @@ def test_find_image_found_and_not_found(tmp_path):
     assert find_image(tmp_path, "bar") is None
 
 
+def test_resize_image_raises_exception(tmp_path):
+    fake_path = tmp_path / "nonexistent.png"
+    with pytest.raises(Exception):
+        resize_image(fake_path, (10, 10))
+
+
 def test_resize_image(tmp_path):
     img_path = tmp_path / "img.png"
     Image.new("RGB", (10, 10)).save(img_path)
@@ -234,6 +240,48 @@ def test_roulette_team_rows_no_valid_rows():
             num_accessory_rows=1,
         )
     assert "Quantidade de linhas de acessório" in str(excinfo.value)
+
+
+def test_roulette_team_rows_selectable_rows():
+    # Create an image with 5 rows (avatar + 4 accessories), 10x50, each row 10px tall
+    row_height = 10
+    num_rows = 5
+    width = 10
+    height = row_height * num_rows
+
+    # All rows will be white, but different pixel values for distinction
+    img = Image.new("RGB", (width, height))
+    for i in range(num_rows):
+        for y in range(i * row_height, (i + 1) * row_height):
+            for x in range(width):
+                img.putpixel((x, y), (i * 50, i * 50, i * 50))
+
+    # Use a dummy RNG that returns selectable_rows in reverse order
+    class DummyRNG:
+        def sample(self, seq, k):
+            # Return the last k elements in reverse order
+            return list(reversed(seq))[:k]
+
+    selectable_rows = [1, 3, 4]  # Only these rows are eligible
+    num_accessory_rows = 3
+    sampled_rows, avatar_imgs, accessory_imgs = roulette_team_rows(
+        [img],
+        num_rows=num_rows,
+        row_height=row_height,
+        avatar_row=1,
+        rng=DummyRNG(),
+        num_accessory_rows=num_accessory_rows,
+        selectable_rows=selectable_rows,
+    )
+
+    # Should return selectable_rows in reverse order
+    assert sampled_rows == [4, 3, 1]
+    # Check that the accessory rows are from the correct indices
+    for idx, acc_img in zip(sampled_rows, accessory_imgs[0]):
+        arr = np.array(acc_img)
+        assert (
+            arr == [idx * 50, idx * 50, idx * 50]
+        ).all(), f"Accessory row {idx} incorrect"
 
 
 def test_roulette_team_rows_basic():
