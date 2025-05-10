@@ -36,6 +36,7 @@ def roulette_team_rows(
     row_height: int = 94,
     avatar_row: int = 1,
     num_accessory_rows: int = 1,
+    selectable_rows: list = None,
     rng=None,
 ):
     """
@@ -50,9 +51,18 @@ def roulette_team_rows(
 
     height = images[0].height
     max_possible_rows = height // row_height
-    valid_rows = [
-        i for i in range(num_rows) if i != (avatar_row - 1) and i < max_possible_rows
-    ]
+    if selectable_rows is not None:
+        valid_rows = [
+            i
+            for i in selectable_rows
+            if i != (avatar_row - 1) and i < max_possible_rows
+        ]
+    else:
+        valid_rows = [
+            i
+            for i in range(num_rows)
+            if i != (avatar_row - 1) and i < max_possible_rows
+        ]
 
     if not valid_rows or num_accessory_rows > len(valid_rows):
         raise ValueError(
@@ -60,7 +70,6 @@ def roulette_team_rows(
         )
 
     sampled_rows = rng.sample(valid_rows, num_accessory_rows)
-    sampled_rows.sort()  # For visual consistency
     avatar_imgs = []
     accessory_imgs = []
     for img in images:
