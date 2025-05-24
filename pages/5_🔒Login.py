@@ -22,10 +22,6 @@ def login_form():
     login_btn = st.button("Entrar", key="login_btn")
 
     placeholder = st.empty()
-    with placeholder.container():
-        st.info(
-            "Para testar o site como visitante, use o usuário **guest** e a senha **guest**."
-        )
 
     if login_btn:
         success, role = authenticate_user(username, password)
@@ -38,7 +34,6 @@ def login_form():
 
             if not st.session_state.get("showed_login_balloons", False):
                 st.balloons()
-                time.sleep(1)
                 st.session_state["showed_login_balloons"] = True
 
             with placeholder.container():
@@ -59,6 +54,6 @@ if __name__ == "__main__":
         st.session_state.logged_in = False
 
     if st.session_state.logged_in:
-        st.switch_page("GetAmpedillis.py")
+        st.switch_page("pages/6_👑_Admin.py")
     else:
         login_form()

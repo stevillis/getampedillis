@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def require_login(login_page="pages/1_🔒Login.py"):
+def require_login(login_page="pages/5_🔒Login.py"):
     """Redirects to login page if user is not logged in."""
     if "logged_in" not in st.session_state or not st.session_state.logged_in:
         st.switch_page(login_page)
