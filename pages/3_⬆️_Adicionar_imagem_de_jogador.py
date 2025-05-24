@@ -1,13 +1,10 @@
 import streamlit as st
 
 from backend.utils import PLAYERS_FOLDER
-from backend.utils.auth import require_login
 from backend.utils.image_utils import get_or_create_image, handle_player_image_upload
 from backend.utils.utils import load_players_df
 
 if __name__ == "__main__":
-    require_login("🔒Login.py")
-
     st.set_page_config(
         page_title="Adicionar imagens de jogadores",
         page_icon=":flipper:",

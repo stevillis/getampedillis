@@ -4,7 +4,6 @@ import streamlit as st
 
 from backend.composers.style_image_composer import PlayerStyleImageComposer
 from backend.utils import PLAYERS_FOLDER, STYLES_FOLDER
-from backend.utils.auth import require_login
 from backend.utils.utils import (
     assign_unique_styles_to_players,
     build_image_columns,
@@ -126,8 +125,6 @@ def render_team_images_grid(
 
 
 if __name__ == "__main__":
-    require_login("🔒Login.py")
-
     st.set_page_config(
         page_title="Criar imagens de estilos random", page_icon=":game_die:"
     )
