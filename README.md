@@ -29,8 +29,8 @@ You can try the app online here: [https://getampedvive.streamlit.app/](https://g
 
 Follow these steps to set up and run the app on your local machine:
 
-### 1. Install Python
-If you do not have Python installed, download and install the latest version from [python.org](https://www.python.org/downloads/).
+### 1. Install Python 3.12
+If you do not have Python 3.12 installed, download and install the latest version from [python.org](https://www.python.org/downloads/).
 
 ### 2. Download the project
 Download the project files from the repository (either by cloning or downloading the ZIP).
