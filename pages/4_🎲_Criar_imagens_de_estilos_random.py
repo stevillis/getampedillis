@@ -8,6 +8,7 @@ from backend.utils.utils import (
     assign_unique_styles_to_players,
     build_image_columns,
     get_players_df,
+    hide_header_actions,
     parse_teams_from_text,
 )
 
@@ -128,6 +129,8 @@ if __name__ == "__main__":
     st.set_page_config(
         page_title="Criar imagens de estilos random", page_icon=":game_die:"
     )
+
+    hide_header_actions()
 
     st.title("Criar imagens de estilos random")
 

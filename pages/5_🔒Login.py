@@ -3,6 +3,7 @@ import time
 import streamlit as st
 
 from backend.utils.auth import authenticate_user
+from backend.utils.utils import hide_header_actions
 
 
 def login_form():
@@ -49,7 +50,13 @@ def login_form():
 
 
 if __name__ == "__main__":
-    st.set_page_config(page_title="Login", page_icon=":lock:")
+    st.set_page_config(
+        page_title="Login",
+        page_icon=":lock:",
+    )
+
+    hide_header_actions()
+
     if "logged_in" not in st.session_state:
         st.session_state.logged_in = False
 

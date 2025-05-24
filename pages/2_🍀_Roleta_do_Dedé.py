@@ -6,6 +6,7 @@ import streamlit as st
 from PIL import Image
 
 from backend.utils.image_utils import roulette_team_rows
+from backend.utils.utils import hide_header_actions
 
 
 def get_uploaded_team_images():
@@ -124,6 +125,8 @@ if __name__ == "__main__":
         page_title="Roleta do Dedé",
         page_icon=":flipper:",
     )
+
+    hide_header_actions()
 
     st.title("Roleta do Dedé")
 

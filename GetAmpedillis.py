@@ -9,7 +9,7 @@ from PIL import Image
 from backend.composers.image_composer import PlayerImageComposer, TeamImageComposer
 from backend.utils import ACCESSORIES_FOLDER, ACCS_BY_YEAR_FILE, PLAYERS_FOLDER
 from backend.utils.image_utils import get_or_create_image
-from backend.utils.utils import get_players_df
+from backend.utils.utils import get_players_df, hide_header_actions
 from backend.validators.tournament_validator import TournamentDataValidator
 
 
@@ -262,4 +262,5 @@ if __name__ == "__main__":
         page_icon=":flipper:",
     )
 
+    hide_header_actions()
     TournamentApp().run()

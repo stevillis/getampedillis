@@ -116,3 +116,17 @@ def get_styles_df():
 
     styles_df = pd.DataFrame({"Name": style_files})
     return styles_df.sort_values("Name")
+
+
+def hide_header_actions():
+    """Hide header action elements."""
+    st.markdown(
+        """
+        <style>
+        [data-testid="stHeaderActionElements"] {
+            display: none;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )

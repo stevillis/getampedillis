@@ -14,6 +14,7 @@ from backend.utils.image_utils import (
     get_num_rows,
     remove_rows,
 )
+from backend.utils.utils import hide_header_actions
 
 ROW_HEIGHT = 94
 
@@ -39,6 +40,8 @@ def download_image(img, label):
 
 if __name__ == "__main__":
     st.set_page_config(page_title="Draft Amped", layout="wide")
+
+    hide_header_actions()
 
     st.title("Draft Amped")
 
