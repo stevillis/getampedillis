@@ -6,7 +6,7 @@ from backend.composers.style_image_composer import (
     TeamStyleImageComposer,
 )
 from backend.utils import PLAYERS_FOLDER, STYLES_FOLDER
-from backend.utils.utils import get_players_df, get_styles_df
+from backend.utils.utils import get_players_df, get_styles_df, hide_header_actions
 from backend.validators.tournament_validator import TournamentDataValidator
 
 
@@ -213,4 +213,5 @@ if __name__ == "__main__":
         page_icon=":flipper:",
     )
 
+    hide_header_actions()
     StyleTournamentApp().run()
