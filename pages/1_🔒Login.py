@@ -59,6 +59,6 @@ if __name__ == "__main__":
         st.session_state.logged_in = False
 
     if st.session_state.logged_in:
-        st.switch_page("pages/1_🗡️_Criar_imagens_de_acessórios.py")
+        st.switch_page("GetAmpedillis.py")
     else:
         login_form()

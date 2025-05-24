@@ -8,7 +8,6 @@ import numpy as np
 import streamlit as st
 from PIL import Image
 
-from backend.utils.auth import require_login
 from backend.utils.image_utils import (
     apply_transparent_gray,
     draw_row_numbers,
@@ -39,7 +38,6 @@ def download_image(img, label):
 
 
 if __name__ == "__main__":
-    require_login("🔒Login.py")
     st.set_page_config(page_title="Draft Amped", layout="wide")
 
     st.title("Draft Amped")

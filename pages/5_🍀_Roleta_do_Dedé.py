@@ -5,7 +5,6 @@ import numpy as np
 import streamlit as st
 from PIL import Image
 
-from backend.utils.auth import require_login
 from backend.utils.image_utils import roulette_team_rows
 
 
@@ -121,8 +120,6 @@ def show_roulette_results(sampled_rows, avatar_imgs, accessory_imgs):
 
 
 if __name__ == "__main__":
-    require_login("🔒Login.py")
-
     st.set_page_config(
         page_title="Roleta do Dedé",
         page_icon=":flipper:",

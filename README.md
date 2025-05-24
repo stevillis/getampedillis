@@ -58,7 +58,7 @@ pip install -r requirements.txt
 ### 6. Run the app
 Start the Streamlit app with:
 ```bash
-python -m streamlit run 🔒Login.py
+python -m streamlit run GetAmpedillis.py
 ```
 
 After running the above command, open your browser and go to [http://localhost:8501](http://localhost:8501/) to use the app.
