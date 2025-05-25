@@ -71,7 +71,16 @@ def get_roulette_settings():
         )
 
     avatar_row = 1
-    eligible_rows = [i for i in range(num_rows) if i != (avatar_row - 1)]
+    all_rows = [i for i in range(num_rows) if i != (avatar_row - 1)]
+    fixed_rows = st.multiselect(
+        "Linhas fixas (sempre presentes)",
+        all_rows,
+        default=[],
+        key="fixed_rows_multiselect",
+    )
+
+    eligible_rows = [i for i in all_rows if i not in fixed_rows]
+
     selectable_rows = st.multiselect(
         "Linhas elegíveis para sorteio",
         eligible_rows,
@@ -90,21 +99,42 @@ def get_roulette_settings():
 
     roulette_clicked = st.button("Sortear!", key="roulette_button")
 
-    return num_rows, num_accessory_rows, selectable_rows, roulette_clicked
+    return num_rows, num_accessory_rows, selectable_rows, fixed_rows, roulette_clicked
 
 
-def show_roulette_results(sampled_rows, avatar_imgs, accessory_imgs):
+def show_roulette_results(
+    sampled_rows,
+    avatar_imgs,
+    accessory_imgs,
+    fixed_rows=None,
+    team_images=None,
+):
     st.subheader(
-        f"Linhas de acessórios sorteadas: {', '.join(str(r) for r in sampled_rows)}"
+        f"Linhas de acessórios sorteadas: " f"{', '.join(str(r) for r in sampled_rows)}"
     )
+    if fixed_rows:
+        st.markdown(
+            f"<b>Linhas fixas:</b> {', '.join(str(r) for r in fixed_rows)}",
+            unsafe_allow_html=True,
+        )
     result_cols = st.columns(2)
 
     now_str = datetime.datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
     for i in range(2):
-        # Stack avatar row + all accessory rows
-        stacked = np.vstack(
-            [np.array(avatar_imgs[i]), *[np.array(acc) for acc in accessory_imgs[i]]]
-        )
+        rows_to_stack = [np.array(avatar_imgs[i])]
+        # Add fixed rows from the original team image
+        if fixed_rows and team_images:
+            arr = np.array(team_images[i])
+            row_height = avatar_imgs[i].height  # Should be 94
+            for row in sorted(fixed_rows):
+                y0 = row * row_height
+                y1 = y0 + row_height
+                fixed_row_img = arr[y0:y1, :, :]
+                rows_to_stack.append(fixed_row_img)
+
+        # Add accessory rows from the sampled rows
+        rows_to_stack += [np.array(acc) for acc in accessory_imgs[i]]
+        stacked = np.vstack(rows_to_stack)
         result_cols[i].image(stacked, caption=f"Time {i+1}", width=300)
 
         img_pil = Image.fromarray(stacked)
@@ -138,6 +168,7 @@ if __name__ == "__main__":
             num_rows,
             num_accessory_rows,
             selectable_rows,
+            fixed_rows,
             roulette_clicked,
         ) = get_roulette_settings()
 
@@ -158,6 +189,7 @@ if __name__ == "__main__":
                     "sampled_rows": sampled_rows,
                     "avatar_imgs": avatar_imgs,
                     "accessory_imgs": accessory_imgs,
+                    "fixed_rows": fixed_rows,
                 }
             except Exception as e:
                 st.error(str(e))
@@ -168,6 +200,8 @@ if __name__ == "__main__":
                 results["sampled_rows"],
                 results["avatar_imgs"],
                 results["accessory_imgs"],
+                results.get("fixed_rows", []),
+                team_images=team_images,
             )
     else:
         st.info("Carregue as imagens dos dois times para começar.")
