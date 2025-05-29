@@ -81,13 +81,14 @@ def get_team_row_settings(team_num, num_rows):
         key=f"selectable_rows_multiselect_team{team_num}",
     )
 
-    max_selectable = max(1, len(selectable_rows))
+    max_selectable = len(selectable_rows)
     num_rows_to_draw = st.number_input(
         f"Quantidade de linhas a sortear - Time {team_num}",
-        min_value=1,
-        max_value=max_selectable if max_selectable > 0 else 1,
-        value=1,
+        min_value=0,
+        max_value=max_selectable if max_selectable > 0 else 0,
+        value=1 if max_selectable > 0 else 0,
         key=f"num_rows_to_draw_team{team_num}",
+        help=("Defina como 0 para usar " "apenas as linhas fixas"),
     )
 
     return fixed_rows, selectable_rows, num_rows_to_draw
