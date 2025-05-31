@@ -2,11 +2,14 @@
 Module for the creating images for GetAmped Tournament.
 """
 
+import logging
+
 import pandas as pd
 import streamlit as st
 from PIL import Image
 
 from backend.composers.image_composer import PlayerImageComposer, TeamImageComposer
+from backend.services.accessory_agent_service import AccessoryAgentService
 from backend.utils import ACCESSORIES_FOLDER, ACCS_BY_YEAR_FILE, PLAYERS_FOLDER
 from backend.utils.image_utils import get_or_create_image
 from backend.utils.utils import get_players_df, hide_header_actions
@@ -60,6 +63,18 @@ class TournamentApp:
         )
         self.team_image_composer = TeamImageComposer(self.player_image_composer)
         self.validator = TournamentDataValidator()
+
+        # Initialize the agent service for ID generation
+        if "agent_service" not in st.session_state:
+            try:
+                st.session_state.agent_service = AccessoryAgentService()
+                (
+                    st.session_state.accessory_mapping,
+                    st.session_state.original_names,
+                ) = st.session_state.agent_service.load_accessories(ACCS_BY_YEAR_FILE)
+            except Exception as e:
+                st.error(f"Erro ao inicializar o serviço de geração de IDs: {str(e)}")
+                st.stop()
 
     def run(self):
         self._render_sidebar()
@@ -116,37 +131,68 @@ class TournamentApp:
         st.markdown("## Criar imagens de acessórios")
         st.markdown("### Torneio")
 
-        players_df = get_players_df()
-        player_options = players_df["Name"].tolist()
-        player_name_input = st.selectbox(
-            "Selecione o jogador",
-            player_options,
-            key="player_name_input",
-        )
+        with st.expander("🔍 Gerar IDs a partir de nomes de acessórios"):
+            st.markdown(
+                "💡 Os nomes dos acessórios não precisam ser exatos, o sistema tentará encontrar a melhor correspondência"
+            )
+            input_text = st.text_area(
+                "Informe a lista de jogadores e acessórios (um por linha)",
+                height=200,
+                placeholder="Jogador1, Long Boots, Drill Hand, Jyuzumaru\nJogador2, Impulse Frame, Bizarre Kangaroo Suit, Steam Slasher",
+                key="id_generator_input",
+            )
 
-        accs_df = get_accs_df().sort_values(by="ID")
-        acc_options = accs_df["ID"].tolist()
-        selected_accs_input = st.multiselect(
-            "Selecione os acessórios",
-            acc_options,
-            key="selected_accs_input",
-        )
-
-        if st.button("Adicionar seleção ao campo de texto"):
-            if not selected_accs_input:
-                st.error(
-                    "Selecione pelo menos um acessório, otário! Tá querendo ganhar título **JEGUE REI :horse::crown:**?"
-                )
-            else:
-                line = player_name_input
-                if selected_accs_input:
-                    line += "," + ",".join(selected_accs_input)
-                if "tournament_data_input" not in st.session_state:
-                    st.session_state["tournament_data_input"] = ""
-                if st.session_state["tournament_data_input"]:
-                    st.session_state["tournament_data_input"] += "\n" + line
+            if st.button("🚀 Gerar IDs", key="generate_ids_button"):
+                if not input_text.strip():
+                    st.warning("Por favor, insira a lista de jogadores e acessórios.")
                 else:
-                    st.session_state["tournament_data_input"] = line
+                    with st.spinner("Processando..."):
+                        try:
+                            result = st.session_state.agent_service.get_accessory_ids(
+                                input_text,
+                                st.session_state.accessory_mapping,
+                                st.session_state.original_names,
+                            )
+                            st.session_state.tournament_data_input = result
+                            st.success(
+                                "IDs gerados e copiados para o campo de dados do torneio!"
+                            )
+                        except Exception as e:
+                            st.error(f"Ocorreu um erro ao processar os dados: {str(e)}")
+                            logging.exception("Error processing accessory IDs")
+
+        with st.expander("👆 Selecionar jogador e acessórios manualmente"):
+            players_df = get_players_df()
+            player_options = players_df["Name"].tolist()
+            player_name_input = st.selectbox(
+                "Selecione o jogador",
+                player_options,
+                key="player_name_input",
+            )
+
+            accs_df = get_accs_df().sort_values(by="ID")
+            acc_options = accs_df["ID"].tolist()
+            selected_accs_input = st.multiselect(
+                "Selecione os acessórios",
+                acc_options,
+                key="selected_accs_input",
+            )
+
+            if st.button("Adicionar seleção ao campo de texto"):
+                if not selected_accs_input:
+                    st.error(
+                        "Selecione pelo menos um acessório, otário! Tá querendo ganhar título **JEGUE REI :horse::crown:**?"
+                    )
+                else:
+                    line = player_name_input
+                    if selected_accs_input:
+                        line += "," + ",".join(selected_accs_input)
+                    if "tournament_data_input" not in st.session_state:
+                        st.session_state["tournament_data_input"] = ""
+                    if st.session_state["tournament_data_input"]:
+                        st.session_state["tournament_data_input"] += "\n" + line
+                    else:
+                        st.session_state["tournament_data_input"] = line
 
         tournament_data_input = st.text_area(
             label="Insira os dados do torneio",
