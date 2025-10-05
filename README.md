@@ -1,23 +1,77 @@
-# Tournament Image Creator
+# 🎮 GetAmpedillis - Tournament Image Creator
 
-This project is a tool for generating images for teams and tournaments, specifically designed for GetAmped events. Users can input team and tournament data, and the app will automatically generate visually appealing images based on the provided information. It is ideal for organizers who want to quickly create shareable graphics for their events.
+**GetAmpedillis** is a comprehensive Streamlit application designed specifically for creating professional tournament images and managing GetAmped events. This powerful tool combines AI-powered accessory recognition, multiple image generation modes, tournament management features, and user authentication to provide a complete solution for GetAmped tournament organizers.
 
-## Authentication & permissions
+## ✨ Key Features
 
-**User authentication is required to access the app.**
-- The app supports multiple user roles: `admin`, `player`, and `guest`.
-- Permissions and access to features are determined by your role.
+### 🔧 Smart Accessory Image Creation
+- **AI-Powered ID Generation**: Uses Google Gemini AI to automatically convert accessory names to IDs
+- **Manual Selection**: Interactive interface for precise accessory and player selection
+- **Tournament Image Generation**: Creates complete tournament bracket images
+- **Automatic Team Formation**: Intelligent team organization and image creation
 
-### Role-based Permissions
-- **Admin**: Can create new users, assign roles, and access the admin area.
-- **Player**: Can upload player images and access main features.
-- **Guest**: Has limited access, useful for testing or demo purposes.
+### 💪 Style-Based Image Creation
+- **Fighting Style Integration**: Create images combining players with their fighting styles
+- **Style Database**: Comprehensive collection of GetAmped fighting styles
+- **Team Style Combinations**: Generate team images with unified or mixed styles
 
-> **Guest login:** Use username `guest` and password `guest` to try the app as a guest.
+### 🍀 Roleta do Dedé (Lottery System)
+- **Random Selection Tool**: Interactive lottery wheel for fair tournament draws
+- **Customizable Options**: Configure participants and selection criteria
+- **Tournament Integration**: Seamlessly integrate results into other tools
 
-### Admin Area
-- Only users with the `admin` role can access the user creation page and manage user roles.
-- Admins can create new users and assign roles directly from the app interface.
+### 🐀 Draft Amped (Advanced Draft System)
+- **Professional Draft Interface**: Complete draft system for competitive tournaments
+- **Alternating Selection**: Fair player distribution across teams
+- **Real-time Updates**: Live draft progression and team formation
+
+### 🎲 Random Style Generator
+- **Surprise Combinations**: Generate unexpected style and player combinations
+- **Casual Event Support**: Perfect for fun, non-competitive tournaments
+- **Infinite Possibilities**: Endless combinations for creative events
+
+## 🚀 Technical Features
+
+### 🤖 AI Integration
+- **Google Gemini AI**: Advanced natural language processing for accessory recognition
+- **Smart Name Matching**: Converts descriptive names to precise accessory IDs
+- **Fuzzy Matching**: Handles typos and variations in accessory names
+- **Context-Aware**: Understands GetAmped-specific terminology
+
+### 🏗️ Architecture
+- **Modular Design**: Clean separation of concerns with dedicated services
+- **Database Integration**: Support for PostgreSQL and local file storage
+- **Image Processing**: Advanced PIL-based image composition
+- **Caching**: Optimized performance with Streamlit caching
+
+### 🔒 Security & Authentication
+- **Multi-Role System**: Comprehensive user role management
+- **Secure Authentication**: BCrypt password hashing
+- **Session Management**: Persistent login sessions
+- **Permission Control**: Feature access based on user roles
+
+## 👥 User Roles & Permissions
+
+**The app requires authentication for access and supports three distinct user roles:**
+
+### 👑 Admin
+- **Full Access**: All features and administrative functions
+- **User Management**: Create, edit, and delete user accounts
+- **Role Assignment**: Manage user permissions and roles
+- **System Configuration**: Access to advanced settings
+
+### 🎮 Player
+- **Core Features**: Access to all image creation tools
+- **Tournament Management**: Use draft and lottery systems
+- **Image Upload**: Add custom player and style images
+- **Profile Management**: Update personal information
+
+### 👁️ Guest
+- **Limited Access**: View-only access to basic features
+- **Demo Mode**: Perfect for testing and demonstrations
+- **No Modifications**: Cannot save or modify data
+
+> **🎯 Quick Test Access:** Use username `guest` and password `guest` to explore the app without registration.
 
 ## App preview
 
@@ -25,42 +79,72 @@ You can try the app online here: [https://getampedvive.streamlit.app/](https://g
 
 ![App Preview](app_preview.png)
 
-## How to run
+## 🛠️ Installation & Setup
 
-Follow these steps to set up and run the app on your local machine:
+### Prerequisites
+- **Python 3.12+**: Download from [python.org](https://www.python.org/downloads/)
+- **Git**: For cloning the repository
+- **Google Gemini API Key**: For AI features (optional for basic functionality)
 
-### 1. Install Python 3.12
-If you do not have Python 3.12 installed, download and install the latest version from [python.org](https://www.python.org/downloads/).
+### Quick Start
 
-### 2. Download the project
-Download the project files from the repository (either by cloning or downloading the ZIP).
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/stevillis/getampedillis.git
+   cd getampedillis
+   ```
 
-### 3. Extract the project
-Extract the ZIP file (if downloaded as ZIP) to a folder of your choice.
+2. **Create Virtual Environment**
+   ```bash
+   python -m venv venv
+   
+   # Windows
+   venv\Scripts\activate
+   
+   # Linux/macOS
+   source venv/bin/activate
+   ```
 
-### 4. Create a virtual environment (recommended)
-Open a terminal or command prompt in the project folder and run:
-```bash
-python -m venv venv
-```
+3. **Install Dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-Activate the virtual environment:
-```bash
-venv\Scripts\activate
-```
+4. **Environment Configuration (Optional)**
+   Create a `.env` file in the root directory:
+   ```env
+   GETAMPEDVIVE_GEMINI_API_KEY=your_gemini_api_key_here
+   GETAMPEDVIVE_GEMINI_MODEL=gemini-2.5-flash
+   DATABASE_URL=your_postgresql_url_here  # Optional
+   ```
 
-### 5. Install dependencies
-Install the required Python packages:
-```bash
-pip install -r requirements.txt
-```
+5. **Run the Application**
+   ```bash
+   streamlit run main.py
+   ```
 
-### 6. Run the app
-Start the Streamlit app with:
-```bash
-python -m streamlit run GetAmpedillis.py
-```
+6. **Access the App**
+   Open your browser and navigate to: [http://localhost:8501](http://localhost:8501)
 
-After running the above command, open your browser and go to [http://localhost:8501](http://localhost:8501/) to use the app.
+## 🔧 Configuration
 
-**Note:** Steps 4 and 5 only need to be done once per setup. If you add new dependencies later, rerun step 5.
+### AI Features Setup
+To enable AI-powered accessory recognition:
+
+1. Get a Google Gemini API key from [Google AI Studio](https://aistudio.google.com/)
+2. Add it to your `.env` file or set as environment variable
+3. The app will automatically detect and enable AI features
+
+### Database Configuration
+- **Default**: Uses local Excel files for data storage
+- **PostgreSQL**: Set `DATABASE_URL` for production database support
+- **Migration**: Automatic data migration tools available
+
+### Custom Data
+- **Players**: Add player images to `data/players/` directory
+- **Accessories**: Add accessory images to `data/accs/` directory  
+- **Styles**: Add style images to `data/styles/` directory
+
+---
+
+**Made with ❤️ for the GetAmped Brasil community**

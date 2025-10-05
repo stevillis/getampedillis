@@ -61,6 +61,6 @@ if __name__ == "__main__":
         st.session_state.logged_in = False
 
     if st.session_state.logged_in:
-        st.switch_page("pages/6_👑_Admin.py")
+        st.switch_page("pages/7_👑_Admin.py")
     else:
         login_form()
