@@ -14,7 +14,7 @@ ACCS_BY_YEAR_FILE: Path = DATA_DIR / "accs_by_year.xlsx"
 
 GETAMPEDVIVE_GEMINI_API_KEY = os.environ.get("GETAMPEDVIVE_GEMINI_API_KEY")
 GETAMPEDVIVE_GEMINI_MODEL = os.environ.get(
-    "GETAMPEDVIVE_GEMINI_MODEL", "gemini-2.0-flash"
+    "GETAMPEDVIVE_GEMINI_MODEL", "gemini-2.5-flash"
 )
 
 

@@ -96,7 +96,7 @@ def upload_image():
 if __name__ == "__main__":
     st.set_page_config(page_title="Admin", page_icon=":flipper:")
     hide_header_actions()
-    require_login("pages/5_🔒Login.py")
+    require_login("pages/6_🔒Login.py")
 
     if st.session_state.get("role") != "admin":
         st.error("Apenas administradores podem acessar esta página.")
