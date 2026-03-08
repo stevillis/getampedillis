@@ -1,183 +1,174 @@
 """
-Service for handling accessory ID generation using AI agent with Gemini.
+Service for handling accessory ID lookup using Supabase vector similarity search (RAG).
 """
 
 import logging
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional
 
 import google.generativeai as genai
-import pandas as pd
+from supabase import create_client
 
 from backend.utils import (
-    ACCS_BY_YEAR_FILE,
     GETAMPEDVIVE_GEMINI_API_KEY,
+    GETAMPEDVIVE_GEMINI_EMBEDDING_MODEL,
     GETAMPEDVIVE_GEMINI_MODEL,
+    SUPABASE_KEY,
+    SUPABASE_URL,
 )
 
 logger = logging.getLogger(__name__)
 
+EMBEDDING_DIMENSIONALITY = 768
+HIGH_CONFIDENCE_THRESHOLD = 0.9
+
 
 class AccessoryAgentService:
-    """Service for handling accessory ID generation using Gemini AI."""
+    """Service for handling accessory ID lookup using Supabase embeddings + RAG."""
 
-    def __init__(self, api_key: str = None, model: str = None):
-        """Initialize the service with API configuration.
+    def __init__(
+        self,
+        api_key: str = None,
+        model: str = None,
+        embedding_model: str = None,
+        supabase_url: str = None,
+        supabase_key: str = None,
+    ):
+        """Initialize the service with API and Supabase configuration.
 
         Args:
-            api_key: Gemini API key. If not provided, will try to get from environment.
-            model: Gemini model name. If not provided, will use default from environment.
+            api_key: Gemini API key. Defaults to env var.
+            model: Gemini model name. Defaults to env var.
+            embedding_model: Gemini embedding model name. Defaults to env var.
+            supabase_url: Supabase project URL. Defaults to env var.
+            supabase_key: Supabase API key. Defaults to env var.
         """
         self.api_key = api_key or GETAMPEDVIVE_GEMINI_API_KEY
         self.model_name = model or GETAMPEDVIVE_GEMINI_MODEL
+        self.embedding_model_name = (
+            embedding_model or GETAMPEDVIVE_GEMINI_EMBEDDING_MODEL
+        )
+
+        resolved_supabase_url = supabase_url or SUPABASE_URL
+        resolved_supabase_key = supabase_key or SUPABASE_KEY
 
         if not self.api_key:
             raise ValueError("Gemini API key is required")
+        if not resolved_supabase_url or not resolved_supabase_key:
+            raise ValueError("Supabase URL and key are required")
 
         genai.configure(api_key=self.api_key)
         self.model = genai.GenerativeModel(self.model_name)
+        self.supabase = create_client(resolved_supabase_url, resolved_supabase_key)
 
-    def load_accessories(
-        self, file_path: str = None
-    ) -> Tuple[Dict[str, str], List[str]]:
-        """Load accessories mapping from Excel file.
+    def _find_accessory_id(self, accessory_name: str) -> Optional[str]:
+        """Find the best matching accessory ID using embedding similarity search.
 
         Args:
-            file_path: Path to the Excel file. If not provided, uses default.
+            accessory_name: The accessory name to search for.
 
         Returns:
-            Tuple containing:
-                - Mapping of normalized names to IDs
-                - List of original accessory names
+            The accessory ID if a match is found, or None.
         """
-        file_path = file_path or ACCS_BY_YEAR_FILE
         try:
-            df = pd.read_excel(file_path)
-            mapping = {}
-            original_names = []
+            # 1. Generate embedding for the query
+            result = genai.embed_content(
+                model=self.embedding_model_name,
+                content=accessory_name,
+                output_dimensionality=EMBEDDING_DIMENSIONALITY,
+            )
 
-            for _, row in df.iterrows():
-                name = str(row["Name"]).strip()
-                acc_id = str(row["ID"]).strip()
+            # 2. Search Supabase for similar embeddings
+            response = self.supabase.rpc(
+                "match_accessory",
+                {
+                    "query_embedding": result["embedding"],
+                    "match_threshold": 0.7,
+                    "match_count": 3,
+                },
+            ).execute()
 
-                original_names.append(name)
-                normalized_name = name.lower().replace(" ", "")
-                mapping[normalized_name] = acc_id
+            if not response.data:
+                logger.warning(f"No embedding match found for: {accessory_name}")
+                return None
 
-            # logger.info(f"Loaded {len(mapping)} accessories from {file_path}")
-            return mapping, original_names
+            top_match = response.data[0]
 
-        except FileNotFoundError:
-            logger.error(f"Accessories file not found: {file_path}")
-            raise
+            # 3. High confidence → return directly
+            if top_match["similarity"] > HIGH_CONFIDENCE_THRESHOLD:
+                logger.debug(
+                    f"High confidence match: '{accessory_name}' → "
+                    f"'{top_match['accessory_name']}' "
+                    f"(similarity={top_match['similarity']:.3f})"
+                )
+                return top_match["accessory_id"]
+
+            # 4. Ambiguous → let Gemini pick from shortlist
+            candidates = [m["accessory_name"] for m in response.data]
+            return self._disambiguate_with_gemini(
+                accessory_name, candidates, response.data
+            )
+
         except Exception as e:
-            logger.error(f"Error loading accessories: {str(e)}")
-            raise
-
-    def _generate_gemini_prompt(self, accessory: str, original_names: List[str]) -> str:
-        """Generate a prompt for Gemini to find the best matching accessory.
-
-        Args:
-            accessory: The accessory name to find a match for
-            original_names: List of valid accessory names
-
-        Returns:
-            Formatted prompt for Gemini
-        """
-        return f"""
-        Given the following list of valid accessory names:
-        {', '.join(original_names[:50])}{'...' if len(original_names) > 50 else ''}
-
-        Find the best matching accessory name for: "{accessory}"
-
-        Return ONLY the matching name exactly as it appears in the list above.
-        If no good match is found, return 'NOT_FOUND'.
-        """
-
-    def _find_best_match_with_difflib(
-        self, query: str, options: List[str], threshold: float = 0.7
-    ) -> Optional[str]:
-        """Find the best match using difflib's sequence matcher.
-
-        Args:
-            query: The search query
-            options: List of possible options
-            threshold: Minimum similarity ratio (0-1) to consider a match
-
-        Returns:
-            Best matching option or None if no good match found
-        """
-        from difflib import get_close_matches
-
-        # Try to find close matches
-        matches = get_close_matches(
-            query.lower(), [opt.lower() for opt in options], n=1, cutoff=threshold
-        )
-
-        if not matches:
+            logger.error(f"Error finding accessory ID for '{accessory_name}': {e}")
             return None
 
-        # Get the original case version of the best match
-        best_match = matches[0]
-        for option in options:
-            if option.lower() == best_match:
-                return option
-
-        return None
-
-    def _find_best_match_with_gemini(
-        self, accessory: str, original_names: List[str]
+    def _disambiguate_with_gemini(
+        self,
+        query: str,
+        candidates: List[str],
+        match_data: list,
     ) -> Optional[str]:
-        """Find the best matching accessory name using Gemini with difflib fallback.
+        """Use Gemini to pick the best match from a shortlist of candidates.
 
         Args:
-            accessory: The accessory name to find a match for
-            original_names: List of valid accessory names
+            query: The original accessory name query.
+            candidates: List of candidate accessory names.
+            match_data: Full match data from Supabase (with accessory_id).
 
         Returns:
-            Best matching accessory name or None if not found
+            The accessory ID of the best match, or the top candidate's ID as fallback.
         """
-        # First try Gemini
         try:
-            prompt = self._generate_gemini_prompt(accessory, original_names)
+            prompt = (
+                f"Given these candidate accessory names: {candidates}\n"
+                f'Which one best matches: "{query}"?\n'
+                f"Return ONLY the exact matching name from the list, or 'NOT_FOUND'."
+            )
             response = self.model.generate_content(prompt)
-
-            # Extract the response text and clean it up
             matched_name = response.text.strip()
 
-            # Check if the response is one of our valid names
-            if matched_name in original_names:
-                return matched_name
+            for m in match_data:
+                if m["accessory_name"] == matched_name:
+                    logger.debug(f"Gemini disambiguated: '{query}' → '{matched_name}'")
+                    return m["accessory_id"]
 
         except Exception as e:
-            logger.warning(f"Error using Gemini for matching: {str(e)}")
+            logger.warning(f"Gemini disambiguation failed for '{query}': {e}")
 
-        # If Gemini failed or didn't find a match, try difflib
-        logger.debug("Gemini didn't find a match, falling back to difflib")
-        return self._find_best_match_with_difflib(accessory, original_names)
+        # Fallback to top similarity match
+        logger.debug(
+            f"Falling back to top match for '{query}': "
+            f"'{match_data[0]['accessory_name']}'"
+        )
+        return match_data[0]["accessory_id"]
 
-    def get_accessory_ids(
-        self, input_text: str, mapping: Dict[str, str], original_names: List[str]
-    ) -> str:
-        """Get accessory IDs for the given input text using Gemini for matching.
+    def get_accessory_ids(self, input_text: str) -> str:
+        """Get accessory IDs for the given input text.
+
+        Each line should be: PlayerName, Accessory1, Accessory2, ...
+        Returns formatted lines: PlayerName,id1,id2,...
 
         Args:
-            input_text: User input text with player and accessories
-            mapping: Dictionary mapping normalized names to IDs
-            original_names: List of original accessory names
+            input_text: User input text with player and accessories.
 
         Returns:
-            Formatted string with player name and comma-separated accessory IDs
+            Formatted string with player name and comma-separated accessory IDs.
         """
         try:
-            # First, split into lines and process each line
             lines = [line.strip() for line in input_text.split("\n") if line.strip()]
             results = []
 
             for line in lines:
-                if not line:
-                    continue
-
-                # Split into player and accessories
                 parts = [p.strip() for p in line.split(",") if p.strip()]
                 if not parts:
                     continue
@@ -185,44 +176,20 @@ class AccessoryAgentService:
                 player_name = parts[0]
                 accessories = parts[1:]
 
-                # Process each accessory
                 accessory_ids = []
                 for acc in accessories:
-                    normalized_acc = acc.lower().replace(" ", "")
-
-                    # First try exact match
-                    if normalized_acc in mapping:
-                        accessory_ids.append(mapping[normalized_acc])
-                        continue
-
-                    # If no exact match, try Gemini for fuzzy matching
-                    best_match = self._find_best_match_with_gemini(acc, original_names)
-                    if best_match:
-                        normalized_match = best_match.lower().replace(" ", "")
-                        accessory_ids.append(mapping[normalized_match])
-                        # logger.info(f"Matched '{acc}' to '{best_match}' using Gemini")
+                    acc_id = self._find_accessory_id(acc)
+                    if acc_id:
+                        accessory_ids.append(acc_id)
                     else:
                         logger.warning(f"Could not find match for accessory: {acc}")
+                        accessory_ids.append(acc)
 
-                # Format the result line if we found any matches
                 if accessory_ids:
                     results.append(f"{player_name},{','.join(accessory_ids)}")
 
             return "\n".join(results) if results else "No valid accessories found"
 
         except Exception as e:
-            logger.error(f"Error processing accessory IDs: {str(e)}")
-            return f"Error: {str(e)}"
-
-    def _find_best_match(self, query: str, options: List[str]) -> Optional[str]:
-        """Legacy method for finding best match (kept for backward compatibility).
-        Now uses Gemini under the hood for better matching.
-
-        Args:
-            query: The search query
-            options: List of possible options
-
-        Returns:
-            Best matching option or None if no good match found
-        """
-        return self._find_best_match_with_gemini(query, options)
+            logger.error(f"Error processing accessory IDs: {e}")
+            return f"Error: {e}"

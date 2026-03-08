@@ -6,7 +6,7 @@
 
 ### 🔧 Smart Accessory Image Creation
 
-- **AI-Powered ID Generation**: Uses Google Gemini AI to automatically convert accessory names to IDs
+- **AI-Powered ID Generation**: Uses Supabase vector embeddings and Google Gemini AI to automatically convert accessory names to IDs
 - **Manual Selection**: Interactive interface for precise accessory and player selection
 - **Tournament Image Generation**: Creates complete tournament bracket images
 - **Automatic Team Formation**: Intelligent team organization and image creation
@@ -40,14 +40,14 @@
 ### 🤖 AI Integration
 
 - **Google Gemini AI**: Advanced natural language processing for accessory recognition
-- **Smart Name Matching**: Converts descriptive names to precise accessory IDs
-- **Fuzzy Matching**: Handles typos and variations in accessory names
+- **Supabase Vector Embeddings**: Fast similarity search using vector embeddings (RAG)
+- **Smart Name Matching**: Converts descriptive names to precise accessory IDs with high accuracy
 - **Context-Aware**: Understands GetAmped-specific terminology
 
 ### 🏗️ Architecture
 
 - **Modular Design**: Clean separation of concerns with dedicated services
-- **Database Integration**: Support for PostgreSQL and local file storage
+- **Database Integration**: Support for PostgreSQL and Supabase
 - **Image Processing**: Advanced PIL-based image composition
 - **Caching**: Optimized performance with Streamlit caching
 
@@ -97,6 +97,7 @@ You can try the app online here: [https://getampedvive.streamlit.app/](https://g
 - **Python 3.12+**: Download from [python.org](https://www.python.org/downloads/)
 - **Git**: For cloning the repository
 - **Google Gemini API Key**: For AI features (optional for basic functionality)
+- **Supabase Account**: For vector-based accessory matching (required for AI features)
 
 ### Quick Start
 
@@ -131,6 +132,9 @@ You can try the app online here: [https://getampedvive.streamlit.app/](https://g
    ```env
    GETAMPEDVIVE_GEMINI_API_KEY=your_gemini_api_key_here
    GETAMPEDVIVE_GEMINI_MODEL=gemini-3.1-flash-lite-preview
+   GETAMPEDVIVE_GEMINI_EMBEDDING_MODEL=gemini-embedding-001
+   SUPABASE_URL=your_supabase_url_here
+   SUPABASE_KEY=your_supabase_key_here
    DATABASE_URL=your_postgresql_url_here  # Optional
    ```
 
@@ -150,12 +154,14 @@ You can try the app online here: [https://getampedvive.streamlit.app/](https://g
 To enable AI-powered accessory recognition:
 
 1. Get a Google Gemini API key from [Google AI Studio](https://aistudio.google.com/)
-2. Add it to your `.env` file or set as environment variable
-3. The app will automatically detect and enable AI features
+2. Create a [Supabase](https://supabase.com/) project and run the SQL in `embeddings/create_table_accessory_embeddings.sql`
+3. Generate accessory embeddings by running `python embeddings/generate_acesssory_embeddings.py`
+4. Add the API keys and Supabase credentials to your `.env` file
+5. The app will automatically detect and enable AI features
 
 ### Database Configuration
 
-- **Default**: Uses local Excel files for data storage
+- **Supabase**: Used for vector-based accessory embeddings and similarity search
 - **PostgreSQL**: Set `DATABASE_URL` for production database support
 - **Migration**: Automatic data migration tools available
 
