@@ -42,18 +42,12 @@ def get_printable_accs_df():
     accs_df.drop(columns=["Icon"], inplace=True)
     accs_df.set_index("Name", inplace=True)
     accs_df["Icon"] = accs_df["ID"].apply(
-        lambda x: f"https://github.com/stevillis/tournament_image_creator/blob/master/data/accs/{x}.png?raw=true"
+        lambda x: (
+            f"https://github.com/stevillis/tournament_image_creator/blob/master/data/accs/{x}.png?raw=true"
+        )
     )
 
     return accs_df
-
-
-def get_accessory_id(accessory):
-    if accessory == "no":
-        return accessory
-
-    accs_df = get_accs_df()
-    acc_series = accs_df[accs_df["Name"].str.lower() == accessory.lower()]["ID"]
 
 
 class TournamentApp:
@@ -68,10 +62,6 @@ class TournamentApp:
         if "agent_service" not in st.session_state:
             try:
                 st.session_state.agent_service = AccessoryAgentService()
-                (
-                    st.session_state.accessory_mapping,
-                    st.session_state.original_names,
-                ) = st.session_state.agent_service.load_accessories(ACCS_BY_YEAR_FILE)
             except Exception as e:
                 st.error(f"Erro ao inicializar o serviço de geração de IDs: {str(e)}")
                 st.stop()
@@ -131,9 +121,17 @@ class TournamentApp:
         st.markdown("## Criar imagens de acessórios")
         st.markdown("### Torneio")
 
-        with st.expander("🔍 Gerar IDs a partir de nomes de acessórios"):
-            st.markdown(
-                "💡 Os nomes dos acessórios não precisam ser exatos, o sistema tentará encontrar a melhor correspondência"
+        tab_ai, tab_manual = st.tabs(
+            [
+                "🔍 Gerar IDs a partir de nomes",
+                "👆 Selecionar manualmente",
+            ]
+        )
+
+        with tab_ai:
+            st.caption(
+                "Use IA para encontrar os IDs dos acessórios a partir dos nomes. "
+                "Os nomes não precisam ser exatos, o sistema tentará encontrar a melhor correspondência."
             )
             input_text = st.text_area(
                 "Informe a lista de jogadores e acessórios (um por linha)",
@@ -149,9 +147,7 @@ class TournamentApp:
                     with st.spinner("Processando..."):
                         try:
                             result = st.session_state.agent_service.get_accessory_ids(
-                                input_text,
-                                st.session_state.accessory_mapping,
-                                st.session_state.original_names,
+                                input_text
                             )
                             st.session_state.tournament_data_input = result
                             st.success(
@@ -161,7 +157,10 @@ class TournamentApp:
                             st.error(f"Ocorreu um erro ao processar os dados: {str(e)}")
                             logging.exception("Error processing accessory IDs")
 
-        with st.expander("👆 Selecionar jogador e acessórios manualmente"):
+        with tab_manual:
+            st.caption(
+                "Selecione o jogador e os IDs dos acessórios manualmente usando os campos abaixo."
+            )
             players_df = get_players_df()
             player_options = players_df["Name"].tolist()
             player_name_input = st.selectbox(
@@ -295,10 +294,10 @@ class TournamentApp:
                 )
 
                 if team_image is not None:
-                    team_image.save(f"generated_images/team_{i+1}.jpg")
+                    team_image.save(f"generated_images/team_{i + 1}.jpg")
                     st.image(
-                        image=Image.open(f"generated_images/team_{i+1}.jpg"),
-                        caption=f"Time {i+1}",
+                        image=Image.open(f"generated_images/team_{i + 1}.jpg"),
+                        caption=f"Time {i + 1}",
                     )
 
 

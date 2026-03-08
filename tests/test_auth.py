@@ -1,3 +1,6 @@
+from unittest.mock import MagicMock, patch
+
+import bcrypt
 import pytest
 
 from backend.utils import auth
@@ -10,21 +13,43 @@ TEST_USERS = [
 
 @pytest.mark.parametrize("user", TEST_USERS)
 def test_authenticate_user_valid(user):
-    success, role = auth.authenticate_user(user["login"], user["password"])
+    hashed = bcrypt.hashpw(user["password"].encode(), bcrypt.gensalt()).decode()
+
+    mock_cursor = MagicMock()
+    mock_cursor.fetchone.return_value = (hashed, user["expected_role"])
+    mock_conn = MagicMock()
+    mock_conn.cursor.return_value = mock_cursor
+
+    with patch.object(auth.psycopg2, "connect", return_value=mock_conn):
+        success, role = auth.authenticate_user(user["login"], user["password"])
 
     assert success is True
     assert role == user["expected_role"]
 
 
 def test_authenticate_user_invalid():
-    success, role = auth.authenticate_user("nonexistent", "wrongpass")
+    mock_cursor = MagicMock()
+    mock_cursor.fetchone.return_value = None
+    mock_conn = MagicMock()
+    mock_conn.cursor.return_value = mock_cursor
+
+    with patch.object(auth.psycopg2, "connect", return_value=mock_conn):
+        success, role = auth.authenticate_user("nonexistent", "wrongpass")
+
     assert success is False
     assert role is None
 
 
 def test_authenticate_user_wrong_password():
-    # Use a real user but with an incorrect password
-    success, role = auth.authenticate_user("guest", "wrongpassword")
+    hashed = bcrypt.hashpw(b"correctpassword", bcrypt.gensalt()).decode()
+
+    mock_cursor = MagicMock()
+    mock_cursor.fetchone.return_value = (hashed, "guest")
+    mock_conn = MagicMock()
+    mock_conn.cursor.return_value = mock_cursor
+
+    with patch.object(auth.psycopg2, "connect", return_value=mock_conn):
+        success, role = auth.authenticate_user("guest", "wrongpassword")
 
     assert success is False
     assert role is None
