@@ -171,6 +171,36 @@ To enable AI-powered accessory recognition:
 - **Accessories**: Add accessory images to `data/accs/` directory
 - **Styles**: Add style images to `data/styles/` directory
 
+## 🧪 Tests
+
+Run the test suite with coverage to make sure everything is working fine:
+
+1. **Run Tests with Coverage**
+
+   ```bash
+   coverage run -m pytest
+   ```
+
+2. **View Coverage Report in Terminal**
+
+   ```bash
+   coverage report -m
+   ```
+
+3. **Generate HTML Coverage Report**
+
+   ```bash
+   coverage html
+   ```
+
+4. **Serve the HTML Report Locally**
+
+   ```bash
+   python -m http.server
+   ```
+
+   Then open [http://localhost:8000/htmlcov/](http://localhost:8000/htmlcov/) in your browser to browse the detailed coverage report.
+
 ---
 
 **Made with ❤️ for the GetAmped Brasil community**
