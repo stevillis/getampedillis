@@ -23,4 +23,4 @@ repos:
         exclude: ^migrations
         language: system
         types: [python]
-        files: ^tests/.*\.py$
+        pass_filenames: false
