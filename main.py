@@ -1,115 +1,327 @@
 """
-GetAmpedillis - Tournament Image Creator
-Main intro page for the GetAmped Tournament image creation app.
+GetAmpedVive - Criador de Imagens para Torneios
+Página principal de introdução do aplicativo GetAmpedVive.
 """
 
 import streamlit as st
 
-from backend.utils.utils import hide_header_actions
+from backend.utils.utils import apply_custom_theme
+
+
+def render_custom_css():
+    """Injeta CSS customizado para melhorar a estética da interface."""
+    st.markdown(
+        """
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+
+        /* Aplica a fonte principal */
+        html, body, [class*="st-"] {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* Hero Section (Área de Destaque) */
+        .hero-container {
+            text-align: center;
+            padding: 4rem 2rem;
+            background-color: #4197FF;
+            border-radius: 24px;
+            margin-bottom: 3rem;
+            color: white;
+            box-shadow: 0 20px 40px rgba(255, 65, 108, 0.2);
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .hero-title {
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+            letter-spacing: -0.04em;
+            line-height: 1.1;
+            color: white !important;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.1rem, 2vw, 1.5rem);
+            font-weight: 400;
+            opacity: 0.95;
+            margin: 0 auto;
+            color: white !important;
+        }
+
+        /* Feature Cards (Cartões de Funcionalidades) */
+        .feature-card {
+            background-color: var(--secondary-background-color);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(150, 150, 150, 0.1);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            height: calc(100% - 1.5rem);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+            border-color: #4197FF;
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        .feature-title {
+            font-weight: 800;
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+            letter-spacing: -0.02em;
+        }
+
+        .feature-desc {
+            font-size: 1rem;
+            color: var(--text-color);
+            opacity: 0.8;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .feature-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .feature-list li {
+            font-size: 0.95rem;
+            color: var(--text-color);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: flex-start;
+            opacity: 0.9;
+        }
+
+        .feature-list li::before {
+            content: "✓";
+            color: #4197FF;
+            font-weight: bold;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+
+        /* Animações */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Rodapé */
+        .footer-container {
+            text-align: center;
+            margin-top: 5rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(150, 150, 150, 0.2);
+            color: var(--text-color);
+            opacity: 0.6;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 def render_intro_page():
-    """Renders the main introduction page for the GetAmpedillis app."""
+    """Renderiza a página principal de introdução da aplicação GetAmpedVive."""
 
-    st.title("🎮 GetAmpedillis")
-    st.subheader("Tournament Image Creator para GetAmped")
+    render_custom_css()
 
+    # Hero Section
     st.markdown(
         """
-    Bem-vindo ao **GetAmpedillis**, uma ferramenta especializada para criar
-    imagens de torneios e times do GetAmped de forma rápida e profissional!
-    """
+        <div class="hero-container">
+            <h1 class="hero-title">🎮 GetAmpedVive</h1>
+            <p class="hero-subtitle">
+                Sua central para criar imagens, organizar torneios e realizar sorteios para a comunidade de GetAmped Brasil.
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
 
-    # Features section
-    st.markdown("## ✨ Funcionalidades")
+    st.markdown("<br>", unsafe_allow_html=True)
 
+    # Grid de Funcionalidades
     col1, col2, col3 = st.columns(3)
 
     with col1:
         st.markdown(
             """
-        ### 🔧 Criação de Imagens de Acessórios
-        - Geração automática de IDs de acessórios
-        - Seleção manual de jogadores e equipamentos
-        - Criação de imagens de torneios completos
-        - Formação automática de times
-        """
+            <div class="feature-card" style="margin-bottom: 0.5rem;">
+                <div class="feature-icon">🔧</div>
+                <h3 class="feature-title">Torneios e Acessórios</h3>
+                <p class="feature-desc">Crie chaves visuais com acessórios e jogadores em poucos cliques.</p>
+                <ul class="feature-list">
+                    <li>Conversão inteligente de nomes para imagens de acessórios</li>
+                    <li>Escolha manual de jogadores e equipamentos</li>
+                    <li>Agrupamento automático de equipes para torneios</li>
+                </ul>
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
+        st.page_link(
+            "pages/1_Torneios_e_Acessorios.py",
+            label="Acessar ferramenta",
+            icon="👉",
+            use_container_width=True,
+        )
+        st.markdown("<br>", unsafe_allow_html=True)
 
         st.markdown(
             """
-        ### 🐀 Draft Amped
-        - Sistema completo de draft para torneios
-        - Seleção alternada de jogadores
-        - Organização automática de times
-        """
+            <div class="feature-card" style="margin-bottom: 0.5rem;">
+                <div class="feature-icon">🐀</div>
+                <h3 class="feature-title">Draft Amped</h3>
+                <p class="feature-desc">Sistema interativo de draft para campeonatos competitivos.</p>
+                <ul class="feature-list">
+                    <li>Seleção alternada justa de jogadores</li>
+                    <li>Organização e balanceamento em tempo real</li>
+                    <li>Formação final das equipes pronta para divulgar</li>
+                </ul>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        st.page_link(
+            "pages/4_Draft_Amped.py",
+            label="Acessar ferramenta",
+            icon="👉",
+            use_container_width=True,
         )
 
     with col2:
         st.markdown(
             """
-        ### 💪 Imagens de Estilos
-        - Criação de imagens com estilos de luta
-        - Combinação de jogadores e seus estilos
-        - Geração de times com estilos específicos
-        """
+            <div class="feature-card" style="margin-bottom: 0.5rem;">
+                <div class="feature-icon">💪</div>
+                <h3 class="feature-title">Estilos de Luta</h3>
+                <p class="feature-desc">Gere composições unindo os jogadores aos seus estilos de luta.</p>
+                <ul class="feature-list">
+                    <li>Combinação visual de personagens e estilos</li>
+                    <li>Criação de times com estilos padronizados</li>
+                    <li>Interface simples para montar a chave completa</li>
+                </ul>
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
+        st.page_link(
+            "pages/2_Estilos_de_Luta.py",
+            label="Acessar ferramenta",
+            icon="👉",
+            use_container_width=True,
+        )
+        st.markdown("<br>", unsafe_allow_html=True)
 
         st.markdown(
             """
-        ### 🎲 Estilos Random
-        - Geração aleatória de combinações de estilos
-        - Criação de imagens com estilos surpresa
-        - Diversão garantida para eventos casuais
-        """
+            <div class="feature-card" style="margin-bottom: 0.5rem;">
+                <div class="feature-icon">🎲</div>
+                <h3 class="feature-title">Estilos Aleatórios</h3>
+                <p class="feature-desc">Geração randômica para eventos casuais e divertidos.</p>
+                <ul class="feature-list">
+                    <li>Sorteio surpresa de combinações de estilos</li>
+                    <li>Diversão garantida sem complicação</li>
+                    <li>Imagens prontas com os resultados instantâneos</li>
+                </ul>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        st.page_link(
+            "pages/5_Estilos_Aleatorios.py",
+            label="Acessar ferramenta",
+            icon="👉",
+            use_container_width=True,
         )
 
     with col3:
         st.markdown(
             """
-        ### 🍀 Roleta do Dedé
-        - Sorteios aleatórios para torneios
-        - Sistema de roleta interativa
-        - Geração de resultados justos e transparentes
-        """
+            <div class="feature-card" style="margin-bottom: 0.5rem;">
+                <div class="feature-icon">🍀</div>
+                <h3 class="feature-title">Roleta do Dedé</h3>
+                <p class="feature-desc">Sorteios aleatórios, justos e transparentes para a comunidade.</p>
+                <ul class="feature-list">
+                    <li>Sistema de roleta visual e interativa</li>
+                    <li>Definição rápida de regras e participantes</li>
+                    <li>Resultados fáceis de compartilhar</li>
+                </ul>
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
+        st.page_link(
+            "pages/3_Roleta_do_Dede.py",
+            label="Acessar ferramenta",
+            icon="👉",
+            use_container_width=True,
+        )
+        st.markdown("<br>", unsafe_allow_html=True)
 
         st.markdown(
             """
-        ### 🔒 Login & 👑 Admin
-        - Sistema seguro de autenticação
-        - Roles: Admin, Player, Guest
-        - Área administrativa para gerenciar usuários
-        - Controle completo de permissões
-        """
+            <div class="feature-card" style="margin-bottom: 0.5rem;">
+                <div class="feature-icon">🔒</div>
+                <h3 class="feature-title">Login & Admin</h3>
+                <p class="feature-desc">Controle total de permissões para manter o ambiente organizado.</p>
+                <ul class="feature-list">
+                    <li>Área administrativa completa (Admin)</li>
+                    <li>Acesso para jogadores salvarem preferências</li>
+                    <li>Modo visitante para experimentar ferramentas</li>
+                </ul>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        st.page_link(
+            "pages/6_Login.py",
+            label="Ir para o Login",
+            icon="👉",
+            use_container_width=True,
         )
 
     # Footer
-    st.markdown("---")
     st.markdown(
         """
-    <div style='text-align: center'>
-        <small>🎮 GetAmpedillis - Criado para a comunidade GetAmped
-        Brasil</small>
-    </div>
-    """,
+        <div class="footer-container">
+            <p>Desenvolvido com dedicação para a comunidade de <strong>GetAmped Brasil</strong></p>
+        </div>
+        """,
         unsafe_allow_html=True,
     )
 
 
 def main():
-    """Main function to run the intro page."""
+    """Função principal para executar a página inicial."""
     st.set_page_config(
-        page_title="GetAmpedillis - Tournament Image Creator",
+        page_title="GetAmpedVive - Torneios & Ferramentas",
         page_icon="🎮",
         layout="wide",
         initial_sidebar_state="expanded",
     )
 
-    hide_header_actions()
+    apply_custom_theme()
 
-    # Render the main intro page
     render_intro_page()
 
 

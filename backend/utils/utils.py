@@ -118,14 +118,41 @@ def get_styles_df():
     return styles_df.sort_values("Name")
 
 
-def hide_header_actions():
-    """Hide header action elements."""
+def apply_custom_theme():
+    """Aplica o tema customizado e estiliza a barra lateral."""
     st.markdown(
         """
         <style>
+        /* Oculta os botões do cabeçalho */
         [data-testid="stHeaderActionElements"] {
             display: none;
         }
+
+        /* Renomeia a Sidebar via CSS (Evita emojis e acentos nos arquivos) */
+        [data-testid="stSidebarNav"] ul li:nth-child(1) span { font-size: 0; }
+        [data-testid="stSidebarNav"] ul li:nth-child(1) span::after { content: "🏠 Início"; font-size: 1rem; }
+
+        [data-testid="stSidebarNav"] ul li:nth-child(2) span { font-size: 0; }
+        [data-testid="stSidebarNav"] ul li:nth-child(2) span::after { content: "🔧 Torneios e Acessórios"; font-size: 1rem; }
+
+        [data-testid="stSidebarNav"] ul li:nth-child(3) span { font-size: 0; }
+        [data-testid="stSidebarNav"] ul li:nth-child(3) span::after { content: "💪 Estilos de Luta"; font-size: 1rem; }
+
+        [data-testid="stSidebarNav"] ul li:nth-child(4) span { font-size: 0; }
+        [data-testid="stSidebarNav"] ul li:nth-child(4) span::after { content: "🍀 Roleta do Dedé"; font-size: 1rem; }
+
+        [data-testid="stSidebarNav"] ul li:nth-child(5) span { font-size: 0; }
+        [data-testid="stSidebarNav"] ul li:nth-child(5) span::after { content: "🐀 Draft Amped"; font-size: 1rem; }
+
+        [data-testid="stSidebarNav"] ul li:nth-child(6) span { font-size: 0; }
+        [data-testid="stSidebarNav"] ul li:nth-child(6) span::after { content: "🎲 Estilos Aleatórios"; font-size: 1rem; }
+
+        [data-testid="stSidebarNav"] ul li:nth-child(7) span { font-size: 0; }
+        [data-testid="stSidebarNav"] ul li:nth-child(7) span::after { content: "🔒 Login"; font-size: 1rem; }
+
+        [data-testid="stSidebarNav"] ul li:nth-child(8) span { font-size: 0; }
+        [data-testid="stSidebarNav"] ul li:nth-child(8) span::after { content: "👑 Painel Admin"; font-size: 1rem; }
+
         </style>
         """,
         unsafe_allow_html=True,

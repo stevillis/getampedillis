@@ -12,7 +12,7 @@ from backend.composers.image_composer import PlayerImageComposer, TeamImageCompo
 from backend.services.accessory_agent_service import AccessoryAgentService
 from backend.utils import ACCESSORIES_FOLDER, ACCS_BY_YEAR_FILE, PLAYERS_FOLDER
 from backend.utils.image_utils import get_or_create_image
-from backend.utils.utils import get_players_df, hide_header_actions
+from backend.utils.utils import get_players_df, apply_custom_theme
 from backend.validators.tournament_validator import TournamentDataValidator
 
 
@@ -140,7 +140,9 @@ class TournamentApp:
                 key="id_generator_input",
             )
 
-            if st.button("🚀 Gerar IDs", key="generate_ids_button"):
+            if st.button(
+                "🚀 Gerar IDs", key="generate_ids_button", use_container_width=True
+            ):
                 if not input_text.strip():
                     st.warning("Por favor, insira a lista de jogadores e acessórios.")
                 else:
@@ -158,7 +160,7 @@ class TournamentApp:
                             logging.exception("Error processing accessory IDs")
 
         with tab_manual:
-            st.caption(
+            st.info(
                 "Selecione o jogador e os IDs dos acessórios manualmente usando os campos abaixo."
             )
             players_df = get_players_df()
@@ -177,11 +179,11 @@ class TournamentApp:
                 key="selected_accs_input",
             )
 
-            if st.button("Adicionar seleção ao campo de texto"):
+            if st.button(
+                "➕ Adicionar seleção ao campo de texto", use_container_width=True
+            ):
                 if not selected_accs_input:
-                    st.error(
-                        "Selecione pelo menos um acessório, otário! Tá querendo ganhar título **JEGUE REI :horse::crown:**?"
-                    )
+                    st.error("Selecione pelo menos um acessório, para continuar.")
                 else:
                     line = player_name_input
                     if selected_accs_input:
@@ -193,23 +195,28 @@ class TournamentApp:
                     else:
                         st.session_state["tournament_data_input"] = line
 
-        tournament_data_input = st.text_area(
-            label="Insira os dados do torneio",
+        st.markdown("#### Dados do Torneio")
+        _ = st.text_area(
+            label="Insira ou verifique os dados gerados abaixo",
             height=200,
-            placeholder="jogador1, id_acessorio1, id_acessorio2\njogador2, id_acessorio1, id_acessorio2",
+            placeholder="Exemplo:\njogador1, id_acessorio1, id_acessorio2\njogador2, id_acessorio1, id_acessorio2",
             key="tournament_data_input",
         )
 
-        if st.button(label="Criar imagem do Torneio", key="create_tournament_image"):
+        if st.button(
+            label="🖼️ Criar Imagem do Torneio",
+            key="create_tournament_image",
+            use_container_width=True,
+        ):
             if len(st.session_state.tournament_data_input) == 0:
                 st.error(
-                    """Insira os dados do torneio, otário! Tá querendo ganhar\ntítulo **JEGUE REI :horse::crown:**?"""
+                    "Por favor, insira os dados do torneio antes de criar a imagem."
                 )
                 return
 
             players_data = self.validator.validate(
                 st.session_state.tournament_data_input,
-                error_message="Formato inválido, otário! Cada linha deve conter o nome do jogador e pelo menos um acessório.",
+                error_message="Formato inválido. Cada linha deve conter o nome do jogador e pelo menos um acessório.",
             )
             if players_data is None:
                 return
@@ -225,87 +232,111 @@ class TournamentApp:
         if "composite_image" in st.session_state:
             st.image(
                 image=Image.open("generated_images/tournament_image.jpg"),
-                caption="Imagem do Torneio",
+                caption="Imagem Oficial do Torneio",
+                use_container_width=True,
             )
 
         st.markdown("---")
 
     def _render_team_section(self):
-        st.markdown("### Formação de Times")
-        tournament_players = []
-        if "tournament_data_input" in st.session_state:
-            for line in st.session_state["tournament_data_input"].splitlines():
-                if line.strip():
-                    player_name = line.split(",")[0].strip()
-                    if player_name:
-                        tournament_players.append(player_name)
+        st.markdown("### 👥 Formação de Times")
+        with st.container(border=True):
+            tournament_players = []
+            if "tournament_data_input" in st.session_state:
+                for line in st.session_state["tournament_data_input"].splitlines():
+                    if line.strip():
+                        player_name = line.split(",")[0].strip()
+                        if player_name:
+                            tournament_players.append(player_name)
 
-        tournament_players = sorted(set(tournament_players))
-        selected_team_players = st.multiselect(
-            "Selecione os jogadores para o time",
-            options=tournament_players,
-            key="selected_team_players_input",
-        )
+            tournament_players = sorted(set(tournament_players))
 
-        if st.button("Adicionar seleção ao campo de times", key="add_team_players"):
-            if not selected_team_players:
-                st.error(
-                    "Selecione pelo menos um jogador para o time, otário! Tá querendo ganhar título **JEGUE REI :horse::crown:**?"
-                )
-            else:
-                line = ", ".join(selected_team_players)
-                if st.session_state.team_tournament_data_input:
-                    st.session_state.team_tournament_data_input += f"\n{line}"
-                else:
-                    st.session_state.team_tournament_data_input = line
-
-        team_tournament_data_input = st.text_area(
-            "Insira apenas os nomes dos jogadores informados acima",
-            height=200,
-            key="team_tournament_data_input",
-            placeholder="jogador1, jogador2, jogador3\njogador4, jogador5, jogador6",
-        )
-
-        if st.button(label="Criar imagens dos Times", key="create_team_images"):
-            if len(st.session_state.team_tournament_data_input) == 0:
-                st.error(
-                    """Insira os dados dos times, otário! Tá querendo ganhar\ntítulo **JEGUE REI :horse::crown:**?"""
-                )
-                return
-
-            team_members_data = []
-            for line in st.session_state.team_tournament_data_input.splitlines():
-                if line.strip():  # Skip empty lines
-                    team_members = [item.strip() for item in line.split(",")]
-                    team_members_data.append(team_members)
-
-            if "players_data" not in st.session_state:
-                st.error(
-                    """Crie a imagem do torneio primeiro, otário! Tá querendo\nganhar título **JEGUE REI :horse::crown:**?"""
-                )
-                return
-
-            players_data = st.session_state.players_data
-            for i, team_members in enumerate(team_members_data):
-                team_image = self.team_image_composer.compose_team(
-                    team_members=team_members,
-                    players_data=players_data,
-                    image_size=(94, 94),
+            col_select, col_btn = st.columns([3, 1])
+            with col_select:
+                selected_team_players = st.multiselect(
+                    "Selecione os jogadores para agrupar em um Time",
+                    options=tournament_players,
+                    key="selected_team_players_input",
                 )
 
-                if team_image is not None:
-                    team_image.save(f"generated_images/team_{i + 1}.jpg")
-                    st.image(
-                        image=Image.open(f"generated_images/team_{i + 1}.jpg"),
-                        caption=f"Time {i + 1}",
+            with col_btn:
+                st.markdown("<br>", unsafe_allow_html=True)
+                if st.button(
+                    "➕ Adicionar Time",
+                    key="add_team_players",
+                    use_container_width=True,
+                ):
+                    if not selected_team_players:
+                        st.error("Selecione pelo menos um jogador para o time.")
+                    else:
+                        line = ", ".join(selected_team_players)
+                        if "team_tournament_data_input" not in st.session_state:
+                            st.session_state.team_tournament_data_input = ""
+                        if st.session_state.team_tournament_data_input:
+                            st.session_state.team_tournament_data_input += f"\n{line}"
+                        else:
+                            st.session_state.team_tournament_data_input = line
+
+            _ = st.text_area(
+                "Times (cada linha representa um Time, contendo os nomes dos jogadores)",
+                height=150,
+                key="team_tournament_data_input",
+                placeholder="Exemplo:\njogador1, jogador2, jogador3\njogador4, jogador5, jogador6",
+            )
+
+            if st.button(
+                label="🖼️ Gerar Imagens dos Times",
+                key="create_team_images",
+                use_container_width=True,
+            ):
+                if len(st.session_state.team_tournament_data_input) == 0:
+                    st.error("Por favor, insira os dados dos times primeiro.")
+                    return
+
+                team_members_data = []
+                for line in st.session_state.team_tournament_data_input.splitlines():
+                    if line.strip():  # Skip empty lines
+                        team_members = [item.strip() for item in line.split(",")]
+                        team_members_data.append(team_members)
+
+                if "players_data" not in st.session_state:
+                    st.error(
+                        "Crie a Imagem do Torneio (etapa anterior) primeiro para poder formar times!"
                     )
+                    return
+
+                players_data = st.session_state.players_data
+                for i, team_members in enumerate(team_members_data):
+                    team_image = self.team_image_composer.compose_team(
+                        team_members=team_members,
+                        players_data=players_data,
+                        image_size=(94, 94),
+                    )
+
+                    if team_image is not None:
+                        team_image.save(f"generated_images/team_{i + 1}.jpg")
+                        st.image(
+                            image=Image.open(f"generated_images/team_{i + 1}.jpg"),
+                            caption=f"🏆 Time {i + 1}",
+                            use_container_width=True,
+                        )
 
 
 if __name__ == "__main__":
     st.set_page_config(
-        page_title="Criar imagens de acessórios",
-        page_icon=":flipper:",
+        page_title="Torneios e Acessórios", page_icon="🔧", layout="wide"
     )
 
-    hide_header_actions()
+    apply_custom_theme()
+
+    st.title("🔧 Torneios e Acessórios")
+    st.info(
+        "**Como usar o Gerador de Acessórios:**\n"
+        "1. Na aba **Gerar IDs a partir de nomes**, cole a lista de jogadores e seus equipamentos e deixe a IA encontrar os IDs corretos.\n"
+        "2. Clique em **Criar Imagem do Torneio** para processar a base de dados.\n"
+        "3. Com a imagem do torneio gerada, vá para a seção **Formação de Times**, selecione os jogadores que formam cada equipe e clique para Gerar as Imagens dos Times.\n"
+        "4. Você poderá usar essas imagens de Time na **Roleta do Dedé** ou no **Draft Amped**."
+    )
+    st.markdown("---")
+
     TournamentApp().run()

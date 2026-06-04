@@ -1,114 +1,120 @@
-# 🎮 GetAmpedillis - Tournament Image Creator
+# 🎮 GetAmpedVive - Ferramentas e Torneios
 
-**GetAmpedillis** is a comprehensive Streamlit application designed specifically for creating professional tournament images and managing GetAmped events. This powerful tool combines AI-powered accessory recognition, multiple image generation modes, tournament management features, and user authentication to provide a complete solution for GetAmped tournament organizers.
+**GetAmpedVive** é uma aplicação completa em Streamlit criada especificamente para gerar imagens profissionais de torneios e gerenciar eventos de GetAmped. Esta ferramenta poderosa combina reconhecimento de acessórios via IA, múltiplos modos de geração de imagens, ferramentas de sorteio e draft, além de autenticação de usuários, fornecendo uma solução centralizada para a comunidade de GetAmped Brasil.
 
-## ✨ Key Features
+## ✨ Principais Funcionalidades
 
-### 🔧 Smart Accessory Image Creation
+### 🔧 Torneios e Acessórios
 
-- **AI-Powered ID Generation**: Uses Supabase vector embeddings and Google Gemini AI to automatically convert accessory names to IDs
-- **Manual Selection**: Interactive interface for precise accessory and player selection
-- **Tournament Image Generation**: Creates complete tournament bracket images
-- **Automatic Team Formation**: Intelligent team organization and image creation
+- **Geração de IDs via IA**: Utiliza embeddings vetoriais do Supabase e a IA do Google Gemini para converter automaticamente nomes de acessórios em IDs reais.
+- **Seleção Manual**: Interface interativa para selecionar jogadores e equipamentos de forma precisa.
+- **Imagens de Torneios**: Cria imagens de chaves de torneio completas.
+- **Formação Automática de Times**: Organização inteligente e geração de imagens de equipes agrupadas.
 
-### 💪 Style-Based Image Creation
+### 💪 Estilos de Luta
 
-- **Fighting Style Integration**: Create images combining players with their fighting styles
-- **Style Database**: Comprehensive collection of GetAmped fighting styles
-- **Team Style Combinations**: Generate team images with unified or mixed styles
+- **Integração de Estilos de Luta**: Crie composições unindo os jogadores aos seus respectivos estilos.
+- **Banco de Dados de Estilos**: Uma coleção completa e atualizada dos estilos de luta do GetAmped.
+- **Combinações de Times**: Gere imagens de equipes exibindo os estilos escolhidos.
 
-### 🍀 Roleta do Dedé (Lottery System)
+### 🍀 Roleta do Dedé
 
-- **Random Selection Tool**: Interactive lottery wheel for fair tournament draws
-- **Customizable Options**: Configure participants and selection criteria
-- **Tournament Integration**: Seamlessly integrate results into other tools
+- **Sistema de Sorteio Aleatório**: Uma roleta interativa visual para realizar sorteios justos nos torneios.
+- **Opções Customizáveis**: Configure quais linhas/equipamentos serão sorteados e quais ficarão fixos.
+- **Integração Fluida**: Faça o upload das imagens de times geradas nas outras abas para aplicar a roleta.
 
-### 🐀 Draft Amped (Advanced Draft System)
+### 🐀 Draft Amped
 
-- **Professional Draft Interface**: Complete draft system for competitive tournaments
-- **Alternating Selection**: Fair player distribution across teams
-- **Real-time Updates**: Live draft progression and team formation
+- **Interface Profissional de Draft**: Sistema de banimentos (picks e bans) interativo para torneios competitivos.
+- **Seleção Interativa**: Marque visualmente as linhas (equipamentos) banidas para escurecê-las em tempo real.
+- **Pronto para Divulgação**: Baixe a imagem final da equipe pós-draft para usar diretamente no campeonato.
 
-### 🎲 Random Style Generator
+### 🎲 Estilos Aleatórios
 
-- **Surprise Combinations**: Generate unexpected style and player combinations
-- **Casual Event Support**: Perfect for fun, non-competitive tournaments
-- **Infinite Possibilities**: Endless combinations for creative events
+- **Geração Surpresa**: Gere combinações aleatórias e inesperadas de estilos para os jogadores.
+- **Filtros por Categoria**: Escolha categorias específicas de estilos (como BASIC, FUSION, RIVAL) para os sorteios.
+- **Foco Casual**: Ferramenta perfeita para eventos divertidos e campeonatos não-competitivos.
 
-## 🚀 Technical Features
+### 🔒 Login & Admin
 
-### 🤖 AI Integration
+- **Painel Administrativo Completo**: Área dedicada para a gestão total da plataforma.
+- **Acesso Seguro**: Sistema de permissões garantindo que visitantes não alterem os dados.
+- **Controle de Jogadores**: Gestão de dados salvos por cada conta logada.
 
-- **Google Gemini AI**: Advanced natural language processing for accessory recognition
-- **Supabase Vector Embeddings**: Fast similarity search using vector embeddings (RAG)
-- **Smart Name Matching**: Converts descriptive names to precise accessory IDs with high accuracy
-- **Context-Aware**: Understands GetAmped-specific terminology
+## 🚀 Recursos Técnicos
 
-### 🏗️ Architecture
+### 🤖 Integração com Inteligência Artificial
 
-- **Modular Design**: Clean separation of concerns with dedicated services
-- **Database Integration**: Support for PostgreSQL and Supabase
-- **Image Processing**: Advanced PIL-based image composition
-- **Caching**: Optimized performance with Streamlit caching
+- **Google Gemini AI**: Processamento de linguagem natural avançado para reconhecer os nomes dos acessórios digitados.
+- **Supabase Vector Embeddings**: Busca por similaridade super rápida (RAG) utilizando vetores.
+- **Match Inteligente**: Converte nomes descritivos e apelidos para os IDs precisos do jogo com alta taxa de acerto.
+- **Ciente de Contexto**: Entende as terminologias específicas usadas pela comunidade de GetAmped.
 
-### 🔒 Security & Authentication
+### 🏗️ Arquitetura
 
-- **Multi-Role System**: Comprehensive user role management
-- **Secure Authentication**: BCrypt password hashing
-- **Session Management**: Persistent login sessions
-- **Permission Control**: Feature access based on user roles
+- **Design Modular**: Separação limpa de responsabilidades com serviços dedicados.
+- **Integração com Banco de Dados**: Suporte nativo ao PostgreSQL e Supabase.
+- **Processamento de Imagens**: Composição avançada de imagens utilizando PIL.
+- **Cache**: Desempenho otimizado usando o sistema de cache do Streamlit.
 
-## 👥 User Roles & Permissions
+### 🔒 Segurança e Autenticação
 
-**The app requires authentication for access and supports three distinct user roles:**
+- **Sistema de Papéis (Roles)**: Gerenciamento abrangente de perfis de usuário.
+- **Autenticação Segura**: Hash de senhas utilizando BCrypt.
+- **Sessões Contínuas**: Gerenciamento de sessões de login persistentes.
+- **Controle de Acesso**: Funcionalidades bloqueadas ou liberadas com base no nível de permissão do usuário.
+
+## 👥 Perfis de Usuário e Permissões
+
+**O aplicativo requer autenticação para algumas áreas e suporta três papéis distintos:**
 
 ### 👑 Admin
 
-- **Full Access**: All features and administrative functions
-- **User Management**: Create, edit, and delete user accounts
-- **Role Assignment**: Manage user permissions and roles
-- **System Configuration**: Access to advanced settings
+- **Acesso Total**: Acesso irrestrito a todas as ferramentas e painel administrativo.
+- **Gerenciamento de Usuários**: Pode criar, editar e excluir contas.
+- **Atribuição de Papéis**: Pode conceder cargos e permissões a outros usuários.
+- **Configuração do Sistema**: Acesso a opções avançadas.
 
 ### 🎮 Player
 
-- **Core Features**: Access to all image creation tools
-- **Tournament Management**: Use draft and lottery systems
-- **Image Upload**: Add custom player and style images
-- **Profile Management**: Update personal information
+- **Recursos Principais**: Acesso às ferramentas de criação de imagens e drafts.
+- **Gestão de Torneios**: Uso irrestrito da Roleta e Draft Amped.
+- **Uploads Personalizados**: Pode adicionar imagens customizadas de estilos e acessórios.
+- **Perfil**: Atualização de preferências pessoais.
 
-### 👁️ Guest
+### 👁️ Guest (Visitante)
 
-- **Limited Access**: View-only access to basic features
-- **Demo Mode**: Perfect for testing and demonstrations
-- **No Modifications**: Cannot save or modify data
+- **Acesso Limitado**: Visão básica da plataforma.
+- **Modo Demo**: Perfeito para testar e conhecer as ferramentas.
+- **Sem Modificações**: Não pode salvar nem alterar dados oficiais.
 
-> **🎯 Quick Test Access:** Use username `guest` and password `guest` to explore the app without registration.
+> **🎯 Acesso Rápido para Testes:** Use o nome de usuário `guest` e a senha `guest` para explorar o aplicativo sem precisar se registrar.
 
-## App preview
+## 📱 Pré-visualização do Aplicativo
 
-You can try the app online here: [https://getampedvive.streamlit.app/](https://getampedvive.streamlit.app/)
+Você pode testar a versão online aqui: [https://getampedvive.streamlit.app/](https://getampedvive.streamlit.app/)
 
 ![App Preview](app_preview.png)
 
-## 🛠️ Installation & Setup
+## 🛠️ Instalação e Configuração
 
-### Prerequisites
+### Pré-requisitos
 
-- **Python 3.12+**: Download from [python.org](https://www.python.org/downloads/)
-- **Git**: For cloning the repository
-- **Google Gemini API Key**: For AI features (optional for basic functionality)
-- **Supabase Account**: For vector-based accessory matching (required for AI features)
+- **Python 3.12+**: Faça o download em [python.org](https://www.python.org/downloads/)
+- **Git**: Para clonar este repositório
+- **Chave de API do Google Gemini**: Para as funções de IA (opcional para uso básico)
+- **Conta no Supabase**: Para busca de acessórios via vetores (necessário para funções de IA)
 
-### Quick Start
+### Começando Rapidamente
 
-1. **Clone the Repository**
+1. **Clone o Repositório**
 
    ```bash
-   git clone https://github.com/stevillis/getampedillis.git
-   cd getampedillis
+   git clone https://github.com/stevillis/getampedvive.git
+   cd getampedvive
    ```
 
-2. **Create Virtual Environment**
+2. **Crie um Ambiente Virtual**
 
    ```bash
    python -m venv venv
@@ -120,87 +126,87 @@ You can try the app online here: [https://getampedvive.streamlit.app/](https://g
    source venv/bin/activate
    ```
 
-3. **Install Dependencies**
+3. **Instale as Dependências**
 
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Environment Configuration (Optional)**
-   Create a `.env` file in the root directory:
+4. **Configuração de Variáveis de Ambiente (Opcional)**
+   Crie um arquivo `.env` na raiz do projeto:
 
    ```env
-   GETAMPEDVIVE_GEMINI_API_KEY=your_gemini_api_key_here
+   GETAMPEDVIVE_GEMINI_API_KEY=sua_chave_de_api_gemini_aqui
    GETAMPEDVIVE_GEMINI_MODEL=gemini-3.1-flash-lite-preview
    GETAMPEDVIVE_GEMINI_EMBEDDING_MODEL=gemini-embedding-001
-   SUPABASE_URL=your_supabase_url_here
-   SUPABASE_KEY=your_supabase_key_here
-   DATABASE_URL=your_postgresql_url_here  # Optional
+   SUPABASE_URL=sua_url_supabase_aqui
+   SUPABASE_KEY=sua_chave_supabase_aqui
+   DATABASE_URL=sua_url_postgresql_aqui  # Opcional
    ```
 
-5. **Run the Application**
+5. **Execute a Aplicação**
 
    ```bash
    streamlit run main.py
    ```
 
-6. **Access the App**
-   Open your browser and navigate to: [http://localhost:8501](http://localhost:8501)
+6. **Acesse o App**
+   Abra o seu navegador e acesse: [http://localhost:8501](http://localhost:8501)
 
-## 🔧 Configuration
+## 🔧 Configurações Adicionais
 
-### AI Features Setup
+### Configurando as Features de IA
 
-To enable AI-powered accessory recognition:
+Para ativar o reconhecimento inteligente de acessórios:
 
-1. Get a Google Gemini API key from [Google AI Studio](https://aistudio.google.com/)
-2. Create a [Supabase](https://supabase.com/) project and run the SQL in `embeddings/create_table_accessory_embeddings.sql`
-3. Generate accessory embeddings by running `python embeddings/generate_acesssory_embeddings.py`
-4. Add the API keys and Supabase credentials to your `.env` file
-5. The app will automatically detect and enable AI features
+1. Obtenha uma chave de API no [Google AI Studio](https://aistudio.google.com/)
+2. Crie um projeto no [Supabase](https://supabase.com/) e execute o SQL contido em `embeddings/create_table_accessory_embeddings.sql`
+3. Gere os embeddings de acessórios rodando `python embeddings/generate_acesssory_embeddings.py`
+4. Adicione as chaves e credenciais ao seu arquivo `.env`
+5. A aplicação irá detectar e habilitar automaticamente os recursos de inteligência artificial.
 
-### Database Configuration
+### Banco de Dados
 
-- **Supabase**: Used for vector-based accessory embeddings and similarity search
-- **PostgreSQL**: Set `DATABASE_URL` for production database support
-- **Migration**: Automatic data migration tools available
+- **Supabase**: Usado primariamente para vetores e busca por similaridade.
+- **PostgreSQL**: Configure `DATABASE_URL` para suporte a banco relacional em produção.
+- **Migração**: Ferramentas de migração automática de dados estão inclusas.
 
-### Custom Data
+### Dados Customizados
 
-- **Players**: Add player images to `data/players/` directory
-- **Accessories**: Add accessory images to `data/accs/` directory
-- **Styles**: Add style images to `data/styles/` directory
+- **Jogadores**: Adicione as imagens dos avatares na pasta `data/players/`
+- **Acessórios**: Adicione as imagens de acessórios na pasta `data/accs/`
+- **Estilos**: Adicione as imagens de estilos de luta na pasta `data/styles/`
 
-## 🧪 Tests
+## 🧪 Testes
 
-Run the test suite with coverage to make sure everything is working fine:
+Rode a suíte de testes com cobertura para garantir que tudo está funcionando perfeitamente:
 
-1. **Run Tests with Coverage**
+1. **Rodar Testes com Cobertura**
 
    ```bash
    coverage run -m pytest
    ```
 
-2. **View Coverage Report in Terminal**
+2. **Ver Relatório no Terminal**
 
    ```bash
    coverage report -m
    ```
 
-3. **Generate HTML Coverage Report**
+3. **Gerar Relatório HTML**
 
    ```bash
    coverage html
    ```
 
-4. **Serve the HTML Report Locally**
+4. **Servir o Relatório HTML Localmente**
 
    ```bash
    python -m http.server
    ```
 
-   Then open [http://localhost:8000/htmlcov/](http://localhost:8000/htmlcov/) in your browser to browse the detailed coverage report.
+   Em seguida, abra [http://localhost:8000/htmlcov/](http://localhost:8000/htmlcov/) no seu navegador para navegar detalhadamente pela cobertura de código.
 
 ---
 
-**Made with ❤️ for the GetAmped Brasil community**
+**Feito com ❤️ para a comunidade de GetAmped Brasil**
