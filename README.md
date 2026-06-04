@@ -94,7 +94,7 @@
 
 Você pode testar a versão online aqui: [https://getampedvive.streamlit.app/](https://getampedvive.streamlit.app/)
 
-![App Preview](app_preview.png)
+![App Preview](./assets/screencapture-getampedvive-streamlit-app.png)
 
 ## 🛠️ Instalação e Configuração
 
