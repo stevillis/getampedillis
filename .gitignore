@@ -180,3 +180,5 @@ pyrightconfig.json
 
 samples.txt
 experiments
+
+.agents/
