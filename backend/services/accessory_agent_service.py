@@ -3,6 +3,7 @@ Service for handling accessory ID lookup using Supabase vector similarity search
 """
 
 import logging
+import time
 from typing import List, Optional
 
 import google.generativeai as genai
@@ -60,6 +61,29 @@ class AccessoryAgentService:
         self.model = genai.GenerativeModel(self.model_name)
         self.supabase = create_client(resolved_supabase_url, resolved_supabase_key)
 
+    def _execute_with_retry(self, func, *args, **kwargs):
+        """Execute a function with exponential backoff on rate limits."""
+        max_retries = 3
+        base_delay = 2
+        for attempt in range(max_retries):
+            try:
+                return func(*args, **kwargs)
+            except Exception as e:
+                error_msg = str(e).lower()
+                if (
+                    "429" in error_msg
+                    or "resource exhausted" in error_msg
+                    or "quota" in error_msg
+                ):
+                    if attempt < max_retries - 1:
+                        sleep_time = base_delay * (2**attempt)
+                        logger.warning(
+                            f"Rate limit hit. Retrying in {sleep_time}s... (Attempt {attempt + 1}/{max_retries})"
+                        )
+                        time.sleep(sleep_time)
+                        continue
+                raise e
+
     def _find_accessory_id(self, accessory_name: str) -> Optional[str]:
         """Find the best matching accessory ID using embedding similarity search.
 
@@ -71,11 +95,14 @@ class AccessoryAgentService:
         """
         try:
             # 1. Generate embedding for the query
-            result = genai.embed_content(
-                model=self.embedding_model_name,
-                content=accessory_name,
-                output_dimensionality=EMBEDDING_DIMENSIONALITY,
-            )
+            def _embed():
+                return genai.embed_content(
+                    model=self.embedding_model_name,
+                    content=accessory_name,
+                    output_dimensionality=EMBEDDING_DIMENSIONALITY,
+                )
+
+            result = self._execute_with_retry(_embed)
 
             # 2. Search Supabase for similar embeddings
             response = self.supabase.rpc(
@@ -134,7 +161,11 @@ class AccessoryAgentService:
                 f'Which one best matches: "{query}"?\n'
                 f"Return ONLY the exact matching name from the list, or 'NOT_FOUND'."
             )
-            response = self.model.generate_content(prompt)
+
+            def _generate():
+                return self.model.generate_content(prompt)
+
+            response = self._execute_with_retry(_generate)
             matched_name = response.text.strip()
 
             for m in match_data:
@@ -168,6 +199,9 @@ class AccessoryAgentService:
             lines = [line.strip() for line in input_text.split("\n") if line.strip()]
             results = []
 
+            # Cache to avoid duplicate API calls for the same accessory
+            accessory_cache = {}
+
             for line in lines:
                 parts = [p.strip() for p in line.split(",") if p.strip()]
                 if not parts:
@@ -178,7 +212,12 @@ class AccessoryAgentService:
 
                 accessory_ids = []
                 for acc in accessories:
-                    acc_id = self._find_accessory_id(acc)
+                    if acc in accessory_cache:
+                        acc_id = accessory_cache[acc]
+                    else:
+                        acc_id = self._find_accessory_id(acc)
+                        accessory_cache[acc] = acc_id
+
                     if acc_id:
                         accessory_ids.append(acc_id)
                     else:
