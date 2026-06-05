@@ -173,6 +173,7 @@ def render_intro_page():
                     <li>Busca fácil de acessórios por Nome e ID</li>
                     <li>Escolha manual de jogadores e equipamentos</li>
                     <li>Agrupamento automático de equipes para torneios</li>
+                    <li>Download rápido das imagens prontas</li>
                 </ul>
             </div>
             """,
@@ -219,6 +220,7 @@ def render_intro_page():
                     <li>Combinação visual de personagens e estilos</li>
                     <li>Criação de times com estilos padronizados</li>
                     <li>Interface simples para montar a chave completa</li>
+                    <li>Download imediato das composições formadas</li>
                 </ul>
             </div>
             """,
@@ -242,6 +244,7 @@ def render_intro_page():
                     <li>Sorteio surpresa de combinações de estilos</li>
                     <li>Diversão garantida sem complicação</li>
                     <li>Imagens prontas com os resultados instantâneos</li>
+                    <li>Download universal dos times sorteados</li>
                 </ul>
             </div>
             """,

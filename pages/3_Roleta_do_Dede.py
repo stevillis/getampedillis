@@ -1,12 +1,9 @@
-import datetime
-import io
-
 import numpy as np
 import streamlit as st
 from PIL import Image
 
 from backend.utils.image_utils import roulette_team_rows
-from backend.utils.utils import apply_custom_theme
+from backend.utils.utils import apply_custom_theme, display_download_button
 
 
 def get_uploaded_team_images():
@@ -189,18 +186,10 @@ def show_team_result(
 
         # Download button
         img_pil = Image.fromarray(stacked)
-        buf = io.BytesIO()
-        img_pil.save(buf, format="PNG")
-
-        now_str = datetime.datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
-        file_name = f"time_{team_idx + 1}_{now_str}.png"
-
-        st.download_button(
+        display_download_button(
+            img=img_pil,
             label=f"⬇️ Baixar Imagem do Time {team_idx + 1}",
-            data=buf.getvalue(),
-            file_name=file_name,
-            mime="image/png",
-            use_container_width=True,
+            filename_prefix=f"roleta_time_{team_idx + 1}",
         )
 
 

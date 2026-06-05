@@ -9,7 +9,11 @@ from PIL import Image
 from backend.composers.image_composer import PlayerImageComposer, TeamImageComposer
 from backend.utils import ACCESSORIES_FOLDER, ACCS_BY_YEAR_FILE, PLAYERS_FOLDER
 from backend.utils.image_utils import get_or_create_image
-from backend.utils.utils import get_players_df, apply_custom_theme
+from backend.utils.utils import (
+    get_players_df,
+    apply_custom_theme,
+    display_download_button,
+)
 from backend.validators.tournament_validator import TournamentDataValidator
 
 
@@ -223,18 +227,26 @@ class TournamentApp:
                 return
 
             st.session_state.players_data = players_data
-            composite_image = self.player_image_composer.compose(
-                players_data=players_data,
-                image_size=(94, 94),
-            )
-            composite_image.save("generated_images/tournament_image.jpg")
-            st.session_state.composite_image = composite_image
+
+            with st.spinner("Gerando imagem do torneio..."):
+                composite_image = self.player_image_composer.compose(
+                    players_data=players_data,
+                    image_size=(94, 94),
+                )
+                composite_image.save("generated_images/tournament_image.jpg")
+                st.session_state.composite_image = composite_image
+            st.success("Imagem do torneio gerada com sucesso!")
 
         if "composite_image" in st.session_state:
             st.image(
                 image=Image.open("generated_images/tournament_image.jpg"),
                 caption="Imagem Oficial do Torneio",
                 use_container_width=True,
+            )
+            display_download_button(
+                img=st.session_state.composite_image,
+                label="⬇️ Baixar Imagem do Torneio",
+                filename_prefix="torneio",
             )
 
         st.markdown("---")
@@ -307,20 +319,35 @@ class TournamentApp:
                     return
 
                 players_data = st.session_state.players_data
-                for i, team_members in enumerate(team_members_data):
-                    team_image = self.team_image_composer.compose_team(
-                        team_members=team_members,
-                        players_data=players_data,
-                        image_size=(94, 94),
-                    )
 
-                    if team_image is not None:
-                        team_image.save(f"generated_images/team_{i + 1}.jpg")
-                        st.image(
-                            image=Image.open(f"generated_images/team_{i + 1}.jpg"),
-                            caption=f"🏆 Time {i + 1}",
-                            use_container_width=True,
+                with st.spinner("Gerando imagens dos times..."):
+                    generated_images = []
+                    for i, team_members in enumerate(team_members_data):
+                        team_image = self.team_image_composer.compose_team(
+                            team_members=team_members,
+                            players_data=players_data,
+                            image_size=(94, 94),
                         )
+
+                        if team_image is not None:
+                            team_image.save(f"generated_images/team_{i + 1}.jpg")
+                            generated_images.append((team_image, i + 1))
+
+                    st.session_state.team_images = generated_images
+                st.success("Imagens dos times geradas com sucesso!")
+
+            if "team_images" in st.session_state:
+                for team_image, team_idx in st.session_state.team_images:
+                    st.image(
+                        image=Image.open(f"generated_images/team_{team_idx}.jpg"),
+                        caption=f"🏆 Time {team_idx}",
+                        use_container_width=True,
+                    )
+                    display_download_button(
+                        img=team_image,
+                        label=f"⬇️ Baixar Imagem do Time {team_idx}",
+                        filename_prefix=f"time_{team_idx}",
+                    )
 
 
 if __name__ == "__main__":

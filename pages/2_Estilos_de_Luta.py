@@ -6,7 +6,12 @@ from backend.composers.style_image_composer import (
     TeamStyleImageComposer,
 )
 from backend.utils import PLAYERS_FOLDER, STYLES_FOLDER
-from backend.utils.utils import get_players_df, get_styles_df, apply_custom_theme
+from backend.utils.utils import (
+    get_players_df,
+    get_styles_df,
+    apply_custom_theme,
+    display_download_button,
+)
 from backend.validators.tournament_validator import TournamentDataValidator
 
 
@@ -133,19 +138,26 @@ class StyleTournamentApp:
                 return
 
             st.session_state.player_styles_data = players_data
-            composite_image = self.player_style_image_composer.compose(
-                players_data=players_data,
-                image_size=(94, 94),
-            )
+            with st.spinner("Gerando imagem do torneio de estilos..."):
+                composite_image = self.player_style_image_composer.compose(
+                    players_data=players_data,
+                    image_size=(94, 94),
+                )
 
-            composite_image.save("generated_images/tournament_style_image.jpg")
-            st.session_state.composite_style_image = composite_image
+                composite_image.save("generated_images/tournament_style_image.jpg")
+                st.session_state.composite_style_image = composite_image
+            st.success("Imagem do torneio gerada com sucesso!")
 
         if "composite_style_image" in st.session_state:
             st.image(
                 image=Image.open("generated_images/tournament_style_image.jpg"),
                 caption="Imagem Oficial dos jogadores e seus estilos",
                 use_container_width=True,
+            )
+            display_download_button(
+                img=st.session_state.composite_style_image,
+                label="⬇️ Baixar Imagem do Torneio de Estilos",
+                filename_prefix="torneio_estilos",
             )
 
         st.markdown("---")
@@ -225,21 +237,36 @@ class StyleTournamentApp:
                     return
 
                 players_data = st.session_state.player_styles_data
-                for i, team_members in enumerate(team_members_data):
-                    team_image = self.team_style_image_composer.compose_team(
-                        team_members=team_members,
-                        players_data=players_data,
-                        image_size=(94, 94),
-                    )
-                    if team_image is not None:
-                        team_image.save(f"generated_images/team_styles_{i + 1}.jpg")
-                        st.image(
-                            image=Image.open(
-                                f"generated_images/team_styles_{i + 1}.jpg"
-                            ),
-                            caption=f"🏆 Time {i + 1} com Estilos",
-                            use_container_width=True,
+
+                with st.spinner("Gerando imagens dos times com estilos..."):
+                    generated_images = []
+                    for i, team_members in enumerate(team_members_data):
+                        team_image = self.team_style_image_composer.compose_team(
+                            team_members=team_members,
+                            players_data=players_data,
+                            image_size=(94, 94),
                         )
+                        if team_image is not None:
+                            team_image.save(f"generated_images/team_styles_{i + 1}.jpg")
+                            generated_images.append((team_image, i + 1))
+
+                    st.session_state.team_style_images = generated_images
+                st.success("Imagens dos times geradas com sucesso!")
+
+            if "team_style_images" in st.session_state:
+                for team_image, team_idx in st.session_state.team_style_images:
+                    st.image(
+                        image=Image.open(
+                            f"generated_images/team_styles_{team_idx}.jpg"
+                        ),
+                        caption=f"🏆 Time {team_idx} com Estilos",
+                        use_container_width=True,
+                    )
+                    display_download_button(
+                        img=team_image,
+                        label=f"⬇️ Baixar Imagem do Time {team_idx}",
+                        filename_prefix=f"time_estilos_{team_idx}",
+                    )
 
 
 if __name__ == "__main__":

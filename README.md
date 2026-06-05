@@ -4,6 +4,12 @@
 
 ## ✨ Principais Funcionalidades
 
+### 💫 Experiência do Usuário (UX) Aprimorada
+
+- **Downloads Universais**: Botões nativos disponíveis para download rápido de qualquer imagem gerada, com nomenclaturas padronizadas.
+- **Feedback Visual**: Indicadores de carregamento (*spinners*) garantem que você saiba quando uma imagem pesada está sendo processada.
+- **Persistência de Dados**: O aplicativo salva suas imagens e progresso temporariamente para evitar a perda do seu trabalho durante a navegação na página.
+
 ### 🔧 Torneios e Acessórios
 
 - **Geração de IDs via IA** *(Nota: Atualmente desativado na interface principal para redução de custos, mas disponível na base de código para uso futuro)*: Utiliza embeddings vetoriais do Supabase e a IA do Google Gemini para converter automaticamente nomes de acessórios em IDs reais.
