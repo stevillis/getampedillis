@@ -1,5 +1,7 @@
 """Utility functions for list manipulation and other general-purpose operations."""
 
+import datetime
+import io
 import os
 import random
 from collections import defaultdict
@@ -7,8 +9,27 @@ from typing import List
 
 import pandas as pd
 import streamlit as st
+from PIL import Image
 
 from backend.utils import PLAYERS_FOLDER, STYLES_FOLDER
+
+
+def display_download_button(img: Image.Image, label: str, filename_prefix: str):
+    """
+    Renders a Streamlit download button for a PIL Image.
+    """
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    now_str = datetime.datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
+    file_name = f"{filename_prefix}_{now_str}.png"
+
+    st.download_button(
+        label=label,
+        data=buf.getvalue(),
+        file_name=file_name,
+        mime="image/png",
+        use_container_width=True,
+    )
 
 
 def parse_teams_from_text(text: str):

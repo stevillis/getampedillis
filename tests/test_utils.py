@@ -1,11 +1,14 @@
 from backend.utils.utils import (
     assign_unique_styles_to_players,
     build_image_columns,
+    display_download_button,
     get_players_df,
     get_styles_df,
     pad_list,
     parse_teams_from_text,
 )
+
+from PIL import Image
 
 
 def test_parse_teams_from_text():
@@ -144,3 +147,22 @@ def test_get_styles_df(tmp_path, monkeypatch):
 
     df = get_styles_df()
     assert set(df["Name"]) == {"style1", "style2"}
+
+
+def test_display_download_button(monkeypatch):
+    called_kwargs = {}
+
+    def mock_download_button(*args, **kwargs):
+        called_kwargs.update(kwargs)
+
+    monkeypatch.setattr("backend.utils.utils.st.download_button", mock_download_button)
+
+    img = Image.new("RGB", (10, 10))
+    display_download_button(img, "Download me", "prefix")
+
+    assert called_kwargs["label"] == "Download me"
+    assert called_kwargs["file_name"].startswith("prefix_")
+    assert called_kwargs["file_name"].endswith(".png")
+    assert called_kwargs["mime"] == "image/png"
+    assert called_kwargs["use_container_width"] is True
+    assert isinstance(called_kwargs["data"], bytes)

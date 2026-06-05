@@ -2,8 +2,6 @@
 Page for uploading two images, selecting rows to exclude, and downloading the processed images.
 """
 
-from io import BytesIO
-
 import numpy as np
 import streamlit as st
 from PIL import Image
@@ -13,7 +11,7 @@ from backend.utils.image_utils import (
     get_num_rows,
     remove_rows,
 )
-from backend.utils.utils import apply_custom_theme
+from backend.utils.utils import apply_custom_theme, display_download_button
 
 ROW_HEIGHT = 94
 
@@ -26,15 +24,9 @@ def upload_image(label):
     return None
 
 
-def download_image(img, label, team_num):
-    buf = BytesIO()
-    img.save(buf, format="PNG")
-    st.download_button(
-        f"⬇️ Baixar Draft do Time {team_num}",
-        buf.getvalue(),
-        file_name=f"{label}.png",
-        mime="image/png",
-        use_container_width=True,
+def download_image_wrapper(img, label, team_num):
+    display_download_button(
+        img=img, label=f"⬇️ Baixar Draft do Time {team_num}", filename_prefix=label
     )
 
 
@@ -107,7 +99,7 @@ if __name__ == "__main__":
                 st.markdown("---")
                 img1_final = remove_rows(img1, excluded_rows1)
                 if img1_final:
-                    download_image(img1_final, "Draft_Time_1", 1)
+                    download_image_wrapper(img1_final, "draft_time_1", 1)
                 else:
                     st.warning("Nenhuma linha restante no Time 1.")
 
@@ -151,7 +143,7 @@ if __name__ == "__main__":
                 st.markdown("---")
                 img2_final = remove_rows(img2, excluded_rows2)
                 if img2_final:
-                    download_image(img2_final, "Draft_Time_2", 2)
+                    download_image_wrapper(img2_final, "draft_time_2", 2)
                 else:
                     st.warning("Nenhuma linha restante no Time 2.")
             else:

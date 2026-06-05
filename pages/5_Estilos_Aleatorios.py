@@ -10,6 +10,7 @@ from backend.utils.utils import (
     get_players_df,
     apply_custom_theme,
     parse_teams_from_text,
+    display_download_button,
 )
 
 IMAGE_SIZE: Tuple[int, int] = (94, 94)
@@ -81,14 +82,13 @@ def get_style_pool(selected):
     return pool
 
 
-def render_team_images_grid(
+def generate_team_images(
     teams: List[List[str]],
     player_style_pairs: List[List[str]],
     player_style_image_composer: PlayerStyleImageComposer,
-    images_per_row: int = 2,
-) -> None:
+) -> List[Tuple[Optional[object], str]]:
     """
-    Render team images in a grid layout using Streamlit columns.
+    Generate team images.
     """
     images_and_captions: List[Tuple[Optional[object], str]] = []
     for idx, team in enumerate(teams, 1):
@@ -112,19 +112,7 @@ def render_team_images_grid(
                 (None, f"Nenhuma coluna de imagem gerada para o time {idx}.")
             )
 
-    # Display in a grid
-    st.markdown("### 🖼️ Imagens Geradas")
-    with st.container(border=True):
-        for i in range(0, len(images_and_captions), images_per_row):
-            cols = st.columns(images_per_row)
-            for j in range(images_per_row):
-                if i + j < len(images_and_captions):
-                    img, caption = images_and_captions[i + j]
-                    with cols[j]:
-                        if img is not None:
-                            st.image(img, caption=caption, use_container_width=True)
-                        else:
-                            st.warning(caption)
+    return images_and_captions
 
 
 if __name__ == "__main__":
@@ -236,6 +224,34 @@ if __name__ == "__main__":
                         )
                         st.session_state["player_styles_data"] = player_style_pairs
 
-                        render_team_images_grid(
-                            teams, player_style_pairs, player_style_image_composer
-                        )
+                        with st.spinner("Gerando imagens dos times aleatórios..."):
+                            images_and_captions = generate_team_images(
+                                teams, player_style_pairs, player_style_image_composer
+                            )
+                            st.session_state["images_and_captions"] = (
+                                images_and_captions
+                            )
+                        st.success("Imagens geradas com sucesso!")
+
+        if "images_and_captions" in st.session_state:
+            images_and_captions = st.session_state["images_and_captions"]
+            st.markdown("### 🖼️ Imagens Geradas")
+            images_per_row = 2
+            with st.container(border=True):
+                for i in range(0, len(images_and_captions), images_per_row):
+                    cols = st.columns(images_per_row)
+                    for j in range(images_per_row):
+                        if i + j < len(images_and_captions):
+                            img, caption = images_and_captions[i + j]
+                            with cols[j]:
+                                if img is not None:
+                                    st.image(
+                                        img, caption=caption, use_container_width=True
+                                    )
+                                    display_download_button(
+                                        img=img,
+                                        label=f"⬇️ Baixar Imagem do Time {i + j + 1}",
+                                        filename_prefix=f"time_aleatorio_{i + j + 1}",
+                                    )
+                                else:
+                                    st.warning(caption)
