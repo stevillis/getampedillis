@@ -25,6 +25,55 @@ GETAMPEDVIVE_GEMINI_EMBEDDING_MODEL = os.environ.get(
 )
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
+
+STYLE_CATEGORIES = {
+    "BASIC": [
+        "Fighter",
+        "Soldier",
+        "Spy",
+        "Superman",
+        "Armor",
+        "Esper",
+        "SpacePolice",
+        "Sumo",
+        "Ninja",
+        "Mercenary",
+        "Scout",
+        "Spriggan",
+    ],
+    "FUSION": [
+        "Monge",
+        "Juiz",
+        "Swordsman",
+        "Beast",
+        "Android",
+        "Phalanx",
+        "Berserker",
+        "HalfBrute",
+        "Borg",
+        "Colosso",
+        "MasterDoll",
+        "Gemini",
+    ],
+    "RIVAL": [
+        "Corrupt",
+        "Veteran",
+        "dsg",
+        "Demon",
+        "Fortress",
+        "Sorcerer",
+        "BHunter",
+        "Wrestler",
+        "DMatter",
+        "Golem",
+        "DarkElf",
+        "KingBeast",
+    ],
+}
+
+ALL_STYLE_NAMES = sum(STYLE_CATEGORIES.values(), [])
+
+CATEGORY_OPTIONS = list(STYLE_CATEGORIES.keys()) + ["Todos"]
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 
 

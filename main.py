@@ -303,6 +303,33 @@ def render_intro_page():
             use_container_width=True,
         )
 
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    col4, col5, col6 = st.columns(3)
+
+    with col4:
+        st.markdown(
+            """
+            <div class="feature-card" style="margin-bottom: 0.5rem;">
+                <div class="feature-icon">🎯</div>
+                <h3 class="feature-title">Roleta do Vitin</h3>
+                <p class="feature-desc">Roletas duplas simultâneas para configurações dinâmicas.</p>
+                <ul class="feature-list">
+                    <li>Sorteio de Regras e Estilos visuais</li>
+                    <li>Filtros automáticos baseados nos resultados</li>
+                    <li>Edição de regras em tempo real</li>
+                </ul>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        st.page_link(
+            "pages/8_Roleta_do_Vitin.py",
+            label="Acessar ferramenta",
+            icon="👉",
+            use_container_width=True,
+        )
+
     # Footer
     st.markdown(
         """

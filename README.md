@@ -35,6 +35,12 @@
 - **Seleção Interativa**: Marque visualmente as linhas (equipamentos) banidas para escurecê-las em tempo real.
 - **Pronto para Divulgação**: Baixe a imagem final da equipe pós-draft para usar diretamente no campeonato.
 
+### 🎯 Roleta do Vitin
+
+- **Sorteio Dinâmico e Condicional**: Duas roletas interativas simultâneas, onde o resultado da primeira dita as opções da segunda.
+- **Integração de Categorias**: O sorteio de "Regras" injeta automaticamente as opções de "Estilos" com base nas categorias do jogo.
+- **Edição em Tempo Real**: Adicione e modifique as opções e regras diretamente pela interface.
+
 ### 🎲 Estilos Aleatórios
 
 - **Geração Surpresa**: Gere combinações aleatórias e inesperadas de estilos para os jogadores.
