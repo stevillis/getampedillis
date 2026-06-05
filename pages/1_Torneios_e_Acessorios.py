@@ -2,14 +2,11 @@
 Module for the creating images for GetAmped Tournament.
 """
 
-import logging
-
 import pandas as pd
 import streamlit as st
 from PIL import Image
 
 from backend.composers.image_composer import PlayerImageComposer, TeamImageComposer
-from backend.services.accessory_agent_service import AccessoryAgentService
 from backend.utils import ACCESSORIES_FOLDER, ACCS_BY_YEAR_FILE, PLAYERS_FOLDER
 from backend.utils.image_utils import get_or_create_image
 from backend.utils.utils import get_players_df, apply_custom_theme
@@ -57,14 +54,6 @@ class TournamentApp:
         )
         self.team_image_composer = TeamImageComposer(self.player_image_composer)
         self.validator = TournamentDataValidator()
-
-        # Initialize the agent service for ID generation
-        if "agent_service" not in st.session_state:
-            try:
-                st.session_state.agent_service = AccessoryAgentService()
-            except Exception as e:
-                st.error(f"Erro ao inicializar o serviço de geração de IDs: {str(e)}")
-                st.stop()
 
     def run(self):
         self._render_sidebar()
@@ -121,73 +110,85 @@ class TournamentApp:
         st.markdown("## Criar imagens de acessórios")
         st.markdown("### Torneio")
 
-        tab_ai, tab_manual = st.tabs(
-            [
-                "🔍 Gerar IDs a partir de nomes",
-                "👆 Selecionar manualmente",
-            ]
-        )
-
-        with tab_ai:
-            st.caption(
-                "Use IA para encontrar os IDs dos acessórios a partir dos nomes. "
-                "Os nomes não precisam ser exatos, o sistema tentará encontrar a melhor correspondência."
-            )
-            input_text = st.text_area(
-                "Informe a lista de jogadores e acessórios (um por linha)",
-                height=200,
-                placeholder="Jogador1, Long Boots, Drill Hand, Jyuzumaru\nJogador2, Impulse Frame, Bizarre Kangaroo Suit, Steam Slasher",
-                key="id_generator_input",
-            )
-
-            if st.button(
-                "🚀 Gerar IDs", key="generate_ids_button", use_container_width=True
-            ):
-                if not input_text.strip():
-                    st.warning("Por favor, insira a lista de jogadores e acessórios.")
-                else:
-                    with st.spinner("Processando..."):
-                        try:
-                            result = st.session_state.agent_service.get_accessory_ids(
-                                input_text
-                            )
-                            st.session_state.tournament_data_input = result
-                            st.success(
-                                "IDs gerados e copiados para o campo de dados do torneio!"
-                            )
-                        except Exception as e:
-                            st.error(f"Ocorreu um erro ao processar os dados: {str(e)}")
-                            logging.exception("Error processing accessory IDs")
-
-        with tab_manual:
+        with st.container(border=True):
             st.info(
-                "Selecione o jogador e os IDs dos acessórios manualmente usando os campos abaixo."
+                "Selecione o jogador e os acessórios usando os campos abaixo para montar a lista do torneio."
             )
-            players_df = get_players_df()
-            player_options = players_df["Name"].tolist()
-            player_name_input = st.selectbox(
-                "Selecione o jogador",
-                player_options,
-                key="player_name_input",
-            )
+            with st.container():
+                players_df = get_players_df()
+                player_options = players_df["Name"].tolist()
+                player_name_input = st.selectbox(
+                    "Selecione o jogador",
+                    player_options,
+                    key="player_name_input",
+                )
 
-            accs_df = get_accs_df().sort_values(by="ID")
-            acc_options = accs_df["ID"].tolist()
-            selected_accs_input = st.multiselect(
-                "Selecione os acessórios",
-                acc_options,
-                key="selected_accs_input",
-            )
+            with st.container():
+                accs_df = get_accs_df().sort_values(by="Name")
 
+                accs_df["Ano_Str"] = accs_df["Ano"].astype(str)
+                available_years = sorted(
+                    [y for y in accs_df["Ano_Str"].unique().tolist() if y != "nan"]
+                )
+
+                selected_years = st.multiselect(
+                    "Filtrar por Ano de Lançamento (Opcional)",
+                    options=available_years,
+                    key="filter_acc_years",
+                )
+
+                if selected_years:
+                    accs_df = accs_df[accs_df["Ano_Str"].isin(selected_years)]
+
+                # Create formatted options "Name (ID)"
+                acc_options = [
+                    f"{row['Name']} ({row['ID']})" for _, row in accs_df.iterrows()
+                ]
+
+                selected_accs_input = st.multiselect(
+                    "Selecione os acessórios (busque por Nome ou ID)",
+                    acc_options,
+                    key="selected_accs_input",
+                )
+
+                if selected_accs_input:
+                    st.markdown("##### Acessórios Selecionados:")
+                    num_cols = 5
+                    for i in range(0, len(selected_accs_input), num_cols):
+                        cols = st.columns(num_cols)
+                        for j, col in enumerate(cols):
+                            idx = i + j
+                            if idx < len(selected_accs_input):
+                                acc_str = selected_accs_input[idx]
+                                acc_id = acc_str.split("(")[-1].replace(")", "").strip()
+                                acc_name = acc_str.rsplit(" (", 1)[0]
+                                acc_image = get_or_create_image(
+                                    folder_path=ACCESSORIES_FOLDER,
+                                    image_name=acc_id,
+                                    size=(48, 48),
+                                )
+                                with col:
+                                    st.image(acc_image)
+                                    st.write(
+                                        f'<span style="font-size: 10px; line-height: 1.1; display: inline-block; margin-top: -5px;">{acc_name}</span>',
+                                        unsafe_allow_html=True,
+                                    )
+
+            st.markdown("<br>", unsafe_allow_html=True)
             if st.button(
-                "➕ Adicionar seleção ao campo de texto", use_container_width=True
+                "➕ Adicionar seleção à lista do torneio", use_container_width=True
             ):
                 if not selected_accs_input:
-                    st.error("Selecione pelo menos um acessório, para continuar.")
+                    st.error("Selecione pelo menos um acessório para continuar.")
                 else:
+                    # Extract IDs from the selected format "Name (ID)"
+                    selected_ids = [
+                        acc.split("(")[-1].replace(")", "").strip()
+                        for acc in selected_accs_input
+                    ]
                     line = player_name_input
-                    if selected_accs_input:
-                        line += "," + ",".join(selected_accs_input)
+                    if selected_ids:
+                        line += "," + ",".join(selected_ids)
                     if "tournament_data_input" not in st.session_state:
                         st.session_state["tournament_data_input"] = ""
                     if st.session_state["tournament_data_input"]:
@@ -332,7 +333,7 @@ if __name__ == "__main__":
     st.title("🔧 Torneios e Acessórios")
     st.info(
         "**Como usar o Gerador de Acessórios:**\n"
-        "1. Na aba **Gerar IDs a partir de nomes**, cole a lista de jogadores e seus equipamentos e deixe a IA encontrar os IDs corretos.\n"
+        "1. Selecione o jogador e os acessórios (podendo buscar pelo nome ou ID), depois clique em Adicionar para incluí-los na lista.\n"
         "2. Clique em **Criar Imagem do Torneio** para processar a base de dados.\n"
         "3. Com a imagem do torneio gerada, vá para a seção **Formação de Times**, selecione os jogadores que formam cada equipe e clique para Gerar as Imagens dos Times.\n"
         "4. Você poderá usar essas imagens de Time na **Roleta do Dedé** ou no **Draft Amped**."

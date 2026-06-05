@@ -6,7 +6,7 @@
 
 ### 🔧 Torneios e Acessórios
 
-- **Geração de IDs via IA**: Utiliza embeddings vetoriais do Supabase e a IA do Google Gemini para converter automaticamente nomes de acessórios em IDs reais.
+- **Geração de IDs via IA** *(Nota: Atualmente desativado na interface principal para redução de custos, mas disponível na base de código para uso futuro)*: Utiliza embeddings vetoriais do Supabase e a IA do Google Gemini para converter automaticamente nomes de acessórios em IDs reais.
 - **Seleção Manual**: Interface interativa para selecionar jogadores e equipamentos de forma precisa.
 - **Imagens de Torneios**: Cria imagens de chaves de torneio completas.
 - **Formação Automática de Times**: Organização inteligente e geração de imagens de equipes agrupadas.
@@ -44,6 +44,7 @@
 ## 🚀 Recursos Técnicos
 
 ### 🤖 Integração com Inteligência Artificial
+*(Nota: As funcionalidades de Inteligência Artificial não estão sendo utilizadas na interface principal atualmente, mas todo o código e infraestrutura estão mantidos para uso futuro)*
 
 - **Google Gemini AI**: Processamento de linguagem natural avançado para reconhecer os nomes dos acessórios digitados.
 - **Supabase Vector Embeddings**: Busca por similaridade super rápida (RAG) utilizando vetores.
@@ -156,6 +157,8 @@ Você pode testar a versão online aqui: [https://getampedvive.streamlit.app/](h
 ## 🔧 Configurações Adicionais
 
 ### Configurando as Features de IA
+
+*(Nota: Como as features de IA não estão sendo utilizadas na interface principal, esta configuração é opcional e serve apenas se você reativar os serviços no código)*
 
 Para ativar o reconhecimento inteligente de acessórios:
 

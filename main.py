@@ -170,7 +170,7 @@ def render_intro_page():
                 <h3 class="feature-title">Torneios e Acessórios</h3>
                 <p class="feature-desc">Crie chaves visuais com acessórios e jogadores em poucos cliques.</p>
                 <ul class="feature-list">
-                    <li>Conversão inteligente de nomes para imagens de acessórios</li>
+                    <li>Busca fácil de acessórios por Nome e ID</li>
                     <li>Escolha manual de jogadores e equipamentos</li>
                     <li>Agrupamento automático de equipes para torneios</li>
                 </ul>
