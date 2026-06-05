@@ -3,7 +3,13 @@ from typing import List, Optional, Tuple
 import streamlit as st
 
 from backend.composers.style_image_composer import PlayerStyleImageComposer
-from backend.utils import PLAYERS_FOLDER, STYLES_FOLDER
+from backend.utils import (
+    PLAYERS_FOLDER,
+    STYLES_FOLDER,
+    STYLE_CATEGORIES,
+    ALL_STYLE_NAMES,
+    CATEGORY_OPTIONS,
+)
 from backend.utils.utils import (
     assign_unique_styles_to_players,
     build_image_columns,
@@ -14,55 +20,6 @@ from backend.utils.utils import (
 )
 
 IMAGE_SIZE: Tuple[int, int] = (94, 94)
-
-STYLE_CATEGORIES = {
-    "BASIC": [
-        "Fighter",
-        "Soldier",
-        "Spy",
-        "Superman",
-        "Armor",
-        "Esper",
-        "SpacePolice",
-        "Sumo",
-        "Ninja",
-        "Mercenary",
-        "Scout",
-        "Spriggan",
-    ],
-    "FUSION": [
-        "Monge",
-        "Juiz",
-        "Swordsman",
-        "Beast",
-        "Android",
-        "Phalanx",
-        "Berserker",
-        "HalfBrute",
-        "Borg",
-        "Colosso",
-        "MasterDoll",
-        "Gemini",
-    ],
-    "RIVAL": [
-        "Corrupt",
-        "Veteran",
-        "dsg",
-        "Demon",
-        "Fortress",
-        "Sorcerer",
-        "BHunter",
-        "Wrestler",
-        "DMatter",
-        "Golem",
-        "DarkElf",
-        "KingBeast",
-    ],
-}
-
-ALL_STYLE_NAMES = sum(STYLE_CATEGORIES.values(), [])
-
-CATEGORY_OPTIONS = list(STYLE_CATEGORIES.keys()) + ["Todos"]
 
 
 def prefill_team_input(selected_players):

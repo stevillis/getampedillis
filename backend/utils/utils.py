@@ -174,6 +174,9 @@ def apply_custom_theme():
         [data-testid="stSidebarNav"] ul li:nth-child(8) span { font-size: 0; }
         [data-testid="stSidebarNav"] ul li:nth-child(8) span::after { content: "👑 Painel Admin"; font-size: 1rem; }
 
+        [data-testid="stSidebarNav"] ul li:nth-child(9) span { font-size: 0; }
+        [data-testid="stSidebarNav"] ul li:nth-child(9) span::after { content: "🎯 Roleta do Vitin"; font-size: 1rem; }
+
         </style>
         """,
         unsafe_allow_html=True,
