@@ -9,14 +9,15 @@ from backend.utils.utils import apply_custom_theme
 class RoletaDoVitinApp:
     def __init__(self):
         self.default_regras = list(STYLE_CATEGORIES.keys()) + [
+            "ESTILO + GEAR EXCLUSIVO",
+            "SWORD/BLADE/GLOVES/HANDS/BOOTS/CHAIN",
+            "ARCANA/SUIT/MASK/ARTS/SCYTE/SHIELD",
+            "ESTILO IGUAL + ITEM BOMBA",
             "2010",
             "2012",
             "2014",
-            "ESTILO IGUAL + ITEM",
-            "ARCANA/SUIT/MASK/SCYTHE",
-            "SWORD/BLADE OU GLOVES",
-            "GEARS ELEMENTAIS",
             "ESTILO + GEAR EXCLUSIVO",
+            "GEARS ELEMENTAIS",
         ]
         self.default_estilos = self._get_available_styles()
 
